@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WiFi Attendance</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#378ADD;--blue-dark:#185FA5;--green:#1D9E75;--red:#D85A30;--bg:#0D0F14;--card:#161920;--card2:#1C1F28;--border:#252830;--text:#F0F2F5;--muted:#6B7280;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;opacity:.3;z-index:0}
+
+.topbar{position:relative;z-index:10;background:rgba(17,19,24,.92);border-bottom:1px solid var(--border);padding:0 20px;height:54px;display:flex;align-items:center;gap:12px;backdrop-filter:blur(12px)}
+.back-btn{padding:6px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-family:var(--font-body);font-size:12px;cursor:pointer;transition:.2s;text-decoration:none;display:flex;align-items:center;gap:5px}
+.back-btn:hover{color:var(--text);border-color:var(--text)}
+.logo{width:34px;height:34px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:12px;font-weight:800;color:#fff}
+.topbar h1{font-family:var(--font-head);font-size:15px;font-weight:700}
+.topbar-right{margin-left:auto}
+.btn-logout{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--red);font-family:var(--font-body);font-size:12px;cursor:pointer;transition:.2s}
+.btn-logout:hover{background:rgba(216,90,48,.1)}
+
+.content{position:relative;z-index:1;flex:1;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:420px;display:flex;flex-direction:column;gap:18px}
+
+.wifi-hero{display:flex;flex-direction:column;align-items:center;gap:12px;padding:10px 0}
+.wifi-rings{position:relative;width:100px;height:100px;display:flex;align-items:center;justify-content:center}
+.ring{position:absolute;border-radius:50%;border:2px solid var(--blue);opacity:0;animation:ripple 2.4s ease-out infinite}
+.ring:nth-child(1){width:40px;height:40px;animation-delay:0s}
+.ring:nth-child(2){width:65px;height:65px;animation-delay:.5s}
+.ring:nth-child(3){width:90px;height:90px;animation-delay:1s}
+@keyframes ripple{0%{opacity:.8;transform:scale(.8)}100%{opacity:0;transform:scale(1.1)}}
+.wifi-icon-center{width:44px;height:44px;background:rgba(55,138,221,.15);border:2px solid var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;z-index:1;position:relative}
+.wifi-hero h2{font-family:var(--font-head);font-size:20px;font-weight:700}
+.wifi-hero p{font-size:13px;color:var(--muted);text-align:center}
+
+.status-bar{padding:12px 16px;border-radius:12px;font-size:13px;font-weight:500;transition:.3s}
+.status-bar.checking{background:rgba(55,138,221,.1);border:1px solid rgba(55,138,221,.25);color:var(--blue)}
+.status-bar.ok   {background:rgba(29,158,117,.1);border:1px solid rgba(29,158,117,.25);color:var(--green)}
+.status-bar.fail {background:rgba(216,90,48,.1);border:1px solid rgba(216,90,48,.25);color:var(--red)}
+
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.info-box{background:var(--card2);border-radius:10px;padding:12px 14px}
+.info-box .lbl{font-size:11px;color:var(--muted);margin-bottom:4px}
+.info-box .val{font-size:13px;font-weight:600;word-break:break-all}
+
+.btn{padding:14px;border:none;border-radius:12px;font-family:var(--font-head);font-size:15px;font-weight:700;cursor:pointer;transition:.2s;width:100%;letter-spacing:.3px}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-blue:hover:not(:disabled){background:var(--blue-dark);transform:translateY(-1px)}
+.btn-gray{background:var(--card2);color:var(--text)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.msg-box{padding:12px 16px;border-radius:10px;font-size:13px;display:none;line-height:1.5}
+.msg-box.show{display:block}
+.msg-box.ok {background:rgba(29,158,117,.1);border:1px solid rgba(29,158,117,.25);color:var(--green)}
+.msg-box.err{background:rgba(216,90,48,.1);border:1px solid rgba(216,90,48,.25);color:var(--red)}
+
+.hint{font-size:11px;color:var(--muted);text-align:center;line-height:1.5}
+.fade-in{animation:fadeIn .4s ease forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:480px){
+  .content{padding:16px 12px}
+  .card{padding:18px 14px}
+  .info-grid{grid-template-columns:1fr}
+  .wifi-rings{transform:scale(.95)}
+}
+</style>
+
+</head>
+<body>
+
+<div class="topbar">
+  <a class="back-btn" href="/employee">← Back </a>
+  <div class="logo">📶</div>
+  <h1>WiFi Attendance</h1>
+  <div class="topbar-right">
+    <button class="btn-logout" onclick="doLogout()">Logout</button>
+  </div>
+</div>
+
+<div class="content fade-in">
+  <div class="card">
+
+    <div class="wifi-hero">
+      <div class="wifi-rings">
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="ring"></div>
+        <div class="wifi-icon-center">📶</div>
+      </div>
+      <h2>WiFi Attendance</h2>
+      <p>Office WiFi  connected <br>attendance automatic mark </p>
+    </div>
+
+    <div class="status-bar checking" id="wifi-status">
+      🔍 Network checking...
+    </div>
+
+    <div class="info-grid">
+      <div class="info-box">
+        <div class="lbl">Your IP</div>
+        <div class="val" id="client-ip">—</div>
+      </div>
+      <div class="info-box">
+        <div class="lbl">Required IP (Office)</div>
+        <div class="val" id="required-ip" style="color:var(--blue)">—</div>
+      </div>
+      <div class="info-box">
+        <div class="lbl">Status</div>
+        <div class="val" id="net-status">Checking...</div>
+      </div>
+      <div class="info-box">
+        <div class="lbl">Time</div>
+        <div class="val" id="cur-time">—</div>
+      </div>
+    </div>
+
+    <button class="btn btn-blue" id="mark-btn" onclick="markWifi()" disabled>
+      Checking Network...
+    </button>
+
+    <div class="msg-box" id="msg"></div>
+
+    <p class="hint">
+      ⚠️ Insure Server PC office WiFi is connected.<br>
+      No personal network is work here
+    </p>
+
+  </div>
+</div>
+
+<script>
+let wifiOk = false;
+let myPublicIP = '';
+
+function updateTime() {
+  document.getElementById('cur-time').textContent =
+    new Date().toLocaleTimeString('en-IN');
+}
+updateTime();
+setInterval(updateTime, 1000);
+
+// Browser se actual public IP fetch karo
+async function fetchMyPublicIP() {
+  const services = [
+    'https://api.ipify.org?format=json',
+    'https://api64.ipify.org?format=json',
+  ];
+  for (const url of services) {
+    try {
+      const r = await fetch(url, { cache: 'no-store' });
+      const d = await r.json();
+      if (d.ip) return d.ip;
+    } catch(e) {}
+  }
+  return '';
+}
+
+async function checkWifi() {
+  const bar = document.getElementById('wifi-status');
+  const btn = document.getElementById('mark-btn');
+  bar.className = 'status-bar checking';
+  bar.textContent = '🔍 IP is detecting...';
+  btn.disabled = true;
+
+  // Pehle browser se public IP lo
+  myPublicIP = await fetchMyPublicIP();
+  document.getElementById('client-ip').textContent = myPublicIP || '—';
+
+  if (!myPublicIP) {
+    bar.className = 'status-bar fail';
+    bar.textContent = '✗ Public IP not detect  — check your Internet';
+    document.getElementById('net-status').textContent = 'Error';
+    wifiOk = false;
+    btn.textContent = 'Retry';
+    btn.disabled = false;
+    return;
+  }
+
+  // Ab server ko bhejo verification ke liye
+  const d = await fetch('/api/wifi-check', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ client_ip: myPublicIP })
+  }).then(r => r.json()).catch(() => null);
+
+  document.getElementById('required-ip').textContent = d?.configured_ip || '(Not configured)';
+
+  if (!d) {
+    bar.className = 'status-bar fail';
+    bar.textContent = '✗ Server not connect';
+    document.getElementById('net-status').textContent = 'Error';
+    wifiOk = false;
+    btn.textContent = 'Retry';
+    btn.disabled = false;
+    return;
+  }
+
+  if (d.on_office_wifi) {
+    bar.className = 'status-bar ok';
+    bar.textContent = `✓ ${d.reason}`;
+    document.getElementById('net-status').textContent = 'Office WiFi ✓';
+    wifiOk = true;
+    btn.textContent = 'Mark WiFi Attendance';
+    btn.disabled = false;
+  } else {
+    bar.className = 'status-bar fail';
+    bar.textContent = `✗ ${d.reason}`;
+    document.getElementById('net-status').textContent = 'Out of Network ✗';
+    wifiOk = false;
+    btn.textContent = 'Connect Office WiFi ';
+    btn.disabled = true;
+  }
+}
+
+async function markWifi() {
+  if (!wifiOk) { checkWifi(); return; }
+
+  const btn = document.getElementById('mark-btn');
+  btn.textContent = 'Marking...';
+  btn.disabled = true;
+
+  const d = await fetch('/api/wifi-attendance', {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ client_ip: myPublicIP })
+  }).then(r => r.json()).catch(() => null);
+
+  if (!d) {
+    showMsg('Server error — Try again', 'err');
+    btn.disabled = false;
+    btn.textContent = 'Mark WiFi Attendance';
+    return;
+  }
+
+    if (d.ok) {
+    showMsg(d.message, 'ok');
+    // If OUT not marked yet, go back so employee page can show status
+    setTimeout(() => { window.location.href = '/employee'; }, 1500);
+  } else {
+    showMsg(d.error || 'Something Worng', 'err');
+    btn.disabled = false;
+    btn.textContent = 'Try Again';
+    checkWifi();
+  }
+}
+
+function showMsg(msg, type) {
+  const el = document.getElementById('msg');
+  el.textContent = msg;
+  el.className = `msg-box ${type} show`;
+}
+
+async function doLogout() {
+  await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+  sessionStorage.clear();
+  window.location.href = '/';
+}
+
+checkWifi();
+setInterval(checkWifi, 20000);
+</script>
+</body>
+</html>

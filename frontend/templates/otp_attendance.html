@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OTP Attendance</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--purple:#7C5CBF;--purple-dark:#5B3FA0;--green:#1D9E75;--red:#D85A30;--bg:#0D0F14;--card:#161920;--card2:#1C1F28;--border:#252830;--text:#F0F2F5;--muted:#6B7280;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;opacity:.3;z-index:0}
+
+.topbar{position:relative;z-index:10;background:rgba(17,19,24,.92);border-bottom:1px solid var(--border);padding:0 20px;height:54px;display:flex;align-items:center;gap:12px;backdrop-filter:blur(12px)}
+.back-btn{padding:6px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-family:var(--font-body);font-size:12px;cursor:pointer;transition:.2s;text-decoration:none;display:flex;align-items:center;gap:5px}
+.back-btn:hover{color:var(--text);border-color:var(--text)}
+.logo{width:34px;height:34px;background:var(--purple);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.topbar h1{font-family:var(--font-head);font-size:15px;font-weight:700}
+.topbar-right{margin-left:auto}
+.btn-logout{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--red);font-family:var(--font-body);font-size:12px;cursor:pointer;transition:.2s}
+.btn-logout:hover{background:rgba(216,90,48,.1)}
+
+.content{position:relative;z-index:1;flex:1;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:420px;display:flex;flex-direction:column;gap:18px}
+
+/* Hero */
+.otp-hero{display:flex;flex-direction:column;align-items:center;gap:12px;padding:6px 0}
+.otp-icon-wrap{width:80px;height:80px;background:rgba(124,92,191,.12);border:2px solid rgba(124,92,191,.3);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:36px}
+.otp-hero h2{font-family:var(--font-head);font-size:20px;font-weight:700}
+.otp-hero p{font-size:13px;color:var(--muted);text-align:center}
+
+/* Steps */
+.step-indicator{display:flex;align-items:center;gap:0;margin-bottom:4px}
+.step{flex:1;text-align:center;padding:8px 0;font-size:12px;font-weight:600;color:var(--muted);border-bottom:2px solid var(--border);transition:.3s;font-family:var(--font-head)}
+.step.active{color:var(--purple);border-color:var(--purple)}
+.step.done{color:var(--green);border-color:var(--green)}
+
+/* Panels */
+.panel{display:none}
+.panel.active{display:flex;flex-direction:column;gap:14px}
+
+/* Mobile Display */
+.mobile-display{background:var(--card2);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.mobile-display .icon{font-size:24px}
+.mobile-display .text .lbl{font-size:11px;color:var(--muted)}
+.mobile-display .text .val{font-size:14px;font-weight:600;margin-top:2px}
+
+/* OTP Input */
+.otp-input-wrap{display:flex;gap:8px;justify-content:center}
+.otp-digit{width:46px;height:56px;background:var(--card2);border:2px solid var(--border);border-radius:12px;text-align:center;font-size:22px;font-weight:700;color:var(--text);font-family:var(--font-head);outline:none;transition:.2s;caret-color:var(--purple)}
+.otp-digit:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(124,92,191,.15)}
+
+/* Timer */
+.timer-wrap{text-align:center;font-size:13px;color:var(--muted)}
+.timer-wrap span{color:var(--purple);font-weight:600}
+.resend-btn{background:none;border:none;color:var(--purple);font-family:var(--font-body);font-size:13px;cursor:pointer;text-decoration:underline;display:none}
+.resend-btn.show{display:inline}
+
+/* Buttons */
+.btn{padding:14px;border:none;border-radius:12px;font-family:var(--font-head);font-size:15px;font-weight:700;cursor:pointer;transition:.2s;width:100%;letter-spacing:.3px}
+.btn-purple{background:var(--purple);color:#fff}
+.btn-purple:hover:not(:disabled){background:var(--purple-dark);transform:translateY(-1px)}
+.btn-gray{background:var(--card2);color:var(--text)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.msg-box{padding:12px 16px;border-radius:10px;font-size:13px;display:none;line-height:1.5}
+.msg-box.show{display:block}
+.msg-box.ok {background:rgba(29,158,117,.1);border:1px solid rgba(29,158,117,.25);color:var(--green)}
+.msg-box.err{background:rgba(216,90,48,.1);border:1px solid rgba(216,90,48,.25);color:var(--red)}
+.msg-box.info{background:rgba(124,92,191,.1);border:1px solid rgba(124,92,191,.25);color:var(--purple)}
+
+.dev-note{background:rgba(124,92,191,.05);border:1px dashed rgba(124,92,191,.3);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--muted)}
+.dev-note strong{color:var(--purple)}
+
+.hint{font-size:11px;color:var(--muted);text-align:center}
+
+.fade-in{animation:fadeIn .4s ease forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:480px){
+  .content{padding:18px 12px}
+  .otp-hero h2{font-size:18px}
+  .otp-icon-wrap{width:72px;height:72px;font-size:30px}
+  .otp-digit{width:42px;height:52px;font-size:20px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <a class="back-btn" href="/employee">← Back</a>
+  <div class="logo">🔢</div>
+  <h1>OTP Attendance</h1>
+  <div class="topbar-right">
+    <button class="btn-logout" onclick="doLogout()">Logout</button>
+  </div>
+</div>
+
+<div class="content fade-in">
+  <div class="card">
+
+    <div class="otp-hero">
+      <div class="otp-icon-wrap">🔢</div>
+      <h2>OTP Attendance</h2>
+      <p>Registered mobile send OTP <br>attendance verify </p>
+    </div>
+
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+      <div class="step active" id="step1-ind">1. OTP Send</div>
+      <div class="step" id="step2-ind">2. Verify </div>
+    </div>
+
+    <!-- Panel 1: Send OTP -->
+    <div class="panel active" id="panel-send">
+      <div class="mobile-display">
+        <div class="icon">📱</div>
+        <div class="text">
+          <div class="lbl">Registered Mobile</div>
+          <div class="val" id="mobile-display">Loading...</div>
+        </div>
+      </div>
+
+      <div class="msg-box" id="msg-send"></div>
+
+      <!-- Dev Note -->
+      <div class="dev-note" id="dev-note">
+        <strong>⚠️ Dev Mode:</strong> Real SMS integration not found , so otp seen on console<br>
+        
+      </div>
+
+      <button class="btn btn-purple" id="send-btn" onclick="sendOTP()">
+        📱 OTP Bhejo
+      </button>
+      <p class="hint">OTP Send on registered Mobile no</p>
+    </div>
+
+    <!-- Panel 2: Verify OTP -->
+    <div class="panel" id="panel-verify">
+      <div class="mobile-display">
+        <div class="icon">📱</div>
+        <div class="text">
+          <div class="lbl">OTP sended</div>
+          <div class="val" id="mobile-sent-display">—</div>
+        </div>
+      </div>
+
+      <!-- OTP Boxes -->
+      <div class="otp-input-wrap">
+        <input class="otp-digit" id="d1" maxlength="1" type="text" inputmode="numeric" oninput="nextDigit(this,'d2')" onkeydown="prevDigit(event,'d1','')">
+        <input class="otp-digit" id="d2" maxlength="1" type="text" inputmode="numeric" oninput="nextDigit(this,'d3')" onkeydown="prevDigit(event,'d2','d1')">
+        <input class="otp-digit" id="d3" maxlength="1" type="text" inputmode="numeric" oninput="nextDigit(this,'d4')" onkeydown="prevDigit(event,'d3','d2')">
+        <input class="otp-digit" id="d4" maxlength="1" type="text" inputmode="numeric" oninput="nextDigit(this,'d5')" onkeydown="prevDigit(event,'d4','d3')">
+        <input class="otp-digit" id="d5" maxlength="1" type="text" inputmode="numeric" oninput="nextDigit(this,'d6')" onkeydown="prevDigit(event,'d5','d4')">
+        <input class="otp-digit" id="d6" maxlength="1" type="text" inputmode="numeric" oninput="nextDigit(this,'')"   onkeydown="prevDigit(event,'d6','d5')" onkeyup="if(event.key==='Enter') verifyOTP()">
+      </div>
+
+      <!-- Timer -->
+      <div class="timer-wrap">
+        OTP <span id="timer-text">5:00</span>  expire  &nbsp;
+        <button class="resend-btn" id="resend-btn" onclick="resendOTP()">send again</button>
+      </div>
+
+      <div class="msg-box" id="msg-verify"></div>
+
+      <!-- Dev OTP display -->
+      <div class="dev-note" id="dev-otp-display" style="display:none">
+        <strong>Dev Mode OTP:</strong> <span id="dev-otp-val" style="font-size:16px;color:#7C5CBF;letter-spacing:3px;font-weight:700">—</span>
+      </div>
+
+      <button class="btn btn-purple" id="verify-btn" onclick="verifyOTP()">
+        ✓ Verify &amp; Mark Attendance
+      </button>
+      <button class="btn btn-gray" style="margin-top:-4px" onclick="goBack()">← GO Back</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+let timerInterval = null;
+let maskedMobile  = '—';
+
+// Show mobile
+const mobile = user.mobile || '';
+maskedMobile  = mobile.length >= 4 ? mobile.slice(0,2) + '****' + mobile.slice(-2) : mobile;
+document.getElementById('mobile-display').textContent     = maskedMobile || 'Not found';
+document.getElementById('mobile-sent-display').textContent = maskedMobile;
+
+// ── OTP digit navigation ──
+function nextDigit(el, nextId) {
+  el.value = el.value.replace(/[^0-9]/g,'');
+  if (el.value && nextId) document.getElementById(nextId)?.focus();
+}
+function prevDigit(e, curId, prevId) {
+  if (e.key === 'Backspace' && !document.getElementById(curId).value && prevId) {
+    document.getElementById(prevId).focus();
+  }
+}
+function getOTP() {
+  return ['d1','d2','d3','d4','d5','d6'].map(id => document.getElementById(id).value).join('');
+}
+function clearOTP() {
+  ['d1','d2','d3','d4','d5','d6'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('d1').focus();
+}
+
+// ── Timer ──
+function startTimer(seconds) {
+  clearInterval(timerInterval);
+  const resendBtn = document.getElementById('resend-btn');
+  resendBtn.classList.remove('show');
+
+  timerInterval = setInterval(() => {
+    seconds--;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    document.getElementById('timer-text').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    if (seconds <= 0) {
+      clearInterval(timerInterval);
+      document.getElementById('timer-text').textContent = 'expire';
+      resendBtn.classList.add('show');
+    }
+  }, 1000);
+}
+
+
+
+
+
+
+// Office Location (example: lat, lng)
+const OFFICE_LAT = 28.626001;   // Enter office Latitude
+const OFFICE_LNG = 77.378001;   // Enter office longitude 
+const ALLOWED_RADIUS = 35000;   // meters (100m allow)
+
+// Distance formula (Haversine)
+function getDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371e3; // meters
+  const φ1 = lat1 * Math.PI/180;
+  const φ2 = lat2 * Math.PI/180;
+  const Δφ = (lat2-lat1) * Math.PI/180;
+  const Δλ = (lon2-lon1) * Math.PI/180;
+
+  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ/2) * Math.sin(Δλ/2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
+
+// Location check
+function checkLocation() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject("Location Not support ");
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const userLat = pos.coords.latitude;
+        const userLng = pos.coords.longitude;
+
+        const distance = getDistance(userLat, userLng, OFFICE_LAT, OFFICE_LNG);
+
+        if (distance <= ALLOWED_RADIUS) {
+          resolve(true);
+        } else {
+          reject("Not in Office Location ❌");
+        }
+      },
+      () => reject("Allow Location access  ")
+    );
+  });
+}
+
+
+
+
+
+
+
+async function sendOTP() {
+  const btn = document.getElementById('send-btn');
+
+  //  Location check first
+  try {
+    await checkLocation();
+  } catch (err) {
+    showMsg('msg-send', err, 'err');
+    return;
+  }
+
+  //  Agar location ok hai tab OTP bhejo
+  btn.textContent = 'Sending...';
+  btn.disabled    = true;
+
+  const d = await fetch('/api/otp/send', {method:'POST'})
+    .then(r => r.json())
+    .catch(() => null);
+
+  if (!d || !d.ok) {
+    showMsg('msg-send', d?.error || 'Server error', 'err');
+    btn.disabled    = false;
+    btn.textContent = '📱send OTP ';
+    return;
+  }
+
+  // Dev OTP show
+  if (d.otp_dev) {
+    document.getElementById('dev-otp-display').style.display = 'block';
+    document.getElementById('dev-otp-val').textContent = d.otp_dev;
+  }
+
+  showMsg('msg-send', d.message, 'ok');
+
+  setTimeout(() => {
+    document.getElementById('panel-send').classList.remove('active');
+    document.getElementById('panel-verify').classList.add('active');
+    document.getElementById('step1-ind').classList.replace('active','done');
+    document.getElementById('step2-ind').classList.add('active');
+    startTimer(300);
+    document.getElementById('d1').focus();
+  }, 600);
+}
+
+
+
+
+
+
+// ── Verify OTP ──
+async function verifyOTP() {
+  const otp = getOTP();
+  if (otp.length < 6) {
+    showMsg('msg-verify', 'Enter 6 digit OTP ', 'err');
+    return;
+  }
+
+  const btn = document.getElementById('verify-btn');
+  btn.textContent = 'Verifying...';
+  btn.disabled    = true;
+
+  const d = await fetch('/api/otp/verify', {
+    method:  'POST',
+    headers: {'Content-Type':'application/json'},
+    body:    JSON.stringify({otp})
+  }).then(r => r.json()).catch(() => null);
+
+  if (!d || !d.ok) {
+    showMsg('msg-verify', d?.error || 'Server error', 'err');
+    btn.disabled    = false;
+    btn.textContent = '✓ Verify & Mark Attendance';
+    clearOTP();
+    return;
+  }
+
+  clearInterval(timerInterval);
+  showMsg('msg-verify', d.message, 'ok');
+  setTimeout(() => { window.location.href = '/employee'; }, 1500);
+}
+
+
+// ── Resend ──
+async function resendOTP() {
+  clearOTP();
+  document.getElementById('panel-verify').classList.remove('active');
+  document.getElementById('panel-send').classList.add('active');
+  document.getElementById('step1-ind').classList.replace('done','active');
+  document.getElementById('step2-ind').classList.remove('active');
+  const btn = document.getElementById('send-btn');
+  btn.disabled    = false;
+  btn.textContent = '📱send OTP ';
+  hideMsg('msg-send');
+  hideMsg('msg-verify');
+}
+
+function goBack() { resendOTP(); }
+
+function showMsg(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className   = `msg-box ${type} show`;
+}
+function hideMsg(id) {
+  document.getElementById(id).className = 'msg-box';
+}
+
+async function doLogout() {
+  await fetch('/api/logout', {method:'POST'});
+  sessionStorage.clear();
+  window.location.href = '/';
+}
+</script>
+</body>
+</html>

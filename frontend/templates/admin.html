@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Attendance — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#1D9E75;--green-dark:#0F6E56;--blue:#378ADD;--blue-dark:#185FA5;
+  --red:#D85A30;--orange:#EF9F27;--purple:#9B59B6;--teal:#5DCAA5;
+  --bg:#0D0F14;--sidebar:#111318;--card:#161920;--card2:#1C1F28;
+  --border:#252830;--text:#F0F2F5;--muted:#6B7280;
+  --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
+  --sidebar-w:220px;--top-h:52px;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);height:100vh;overflow:hidden;display:grid;grid-template-rows:var(--top-h) 1fr;grid-template-columns:var(--sidebar-w) 1fr}
+
+/* ── HAMBURGER / MOBILE SIDEBAR ── */
+.hamburger{display:none;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:18px;padding:4px 10px;cursor:pointer;transition:.2s;flex-shrink:0}
+.hamburger:hover{background:var(--card2)}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;backdrop-filter:blur(2px)}
+.sidebar-overlay.open{display:block}
+
+@media(max-width:768px){
+  body{height:auto;overflow:auto;grid-template-rows:var(--top-h) 1fr;grid-template-columns:1fr}
+  .hamburger{display:flex;align-items:center}
+  .sidebar{
+    display:flex!important;position:fixed;left:-100%;top:var(--top-h);bottom:0;
+    width:220px;z-index:100;transition:left .25s ease;
+    border-right:1px solid var(--border);overflow-y:auto;
+  }
+  .sidebar.open{left:0}
+  .main{grid-column:1}
+  .stats-row{grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px 0}
+  .tab-body{grid-template-columns:1fr;gap:12px;padding:12px 14px}
+  .panel{padding:14px;gap:10px}
+  .topbar{padding:0 12px}
+  .top-date{display:none}
+  .dl-grid{grid-template-columns:1fr 1fr}
+  .acc-row{grid-template-columns:80px 1fr 90px}
+}
+
+
+/* ── TOPBAR ── */
+.topbar{grid-column:1/-1;background:var(--sidebar);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px}
+.topbar .logo{width:32px;height:32px;background:var(--green);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:11px;font-weight:800;color:#fff}
+.topbar h1{font-family:var(--font-head);font-size:15px;font-weight:700}
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-live{background:rgba(29,158,117,.2);color:var(--green)}
+.badge-admin{background:rgba(55,138,221,.2);color:var(--blue)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+.net-status{font-size:12px;color:var(--muted)}
+.net-status.ok{color:var(--green)}
+.net-status.bad{color:var(--red)}
+.top-date{font-size:12px;color:var(--muted)}
+.btn-logout{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--red);font-family:var(--font-body);font-size:12px;cursor:pointer;transition:.2s}
+.btn-logout:hover{background:rgba(216,90,48,.1)}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--sidebar);border-right:1px solid var(--border);padding:16px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.nav-section{font-size:10px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;padding:12px 8px 4px;font-weight:600}
+.nav-btn{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:9px;border:none;background:transparent;color:var(--muted);font-family:var(--font-body);font-size:13px;cursor:pointer;width:100%;text-align:left;transition:.15s}
+.nav-btn:hover{background:var(--card2);color:var(--text)}
+.nav-btn.active{background:var(--card2);color:var(--text)}
+.nav-btn .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.nav-btn-danger{color:var(--red)!important}
+.sidebar-spacer{flex:1}
+
+/* ── MAIN ── */
+.main{overflow-y:auto;padding:0}
+.tab{display:none;height:100%;flex-direction:column}
+.tab.active{display:flex}
+
+/* ── STATS ROW ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:16px 20px 0}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.stat-card .label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.stat-card .val{font-family:var(--font-head);font-size:28px;font-weight:800}
+.stat-card .sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ── TAB BODY ── */
+.tab-body{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 20px;min-height:0;overflow:hidden}
+
+@media(max-width:768px){
+  .stats-row{grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px 0}
+  .tab-body{grid-template-columns:1fr;gap:12px;padding:12px 14px}
+  .panel{padding:14px;gap:10px}
+  .topbar{padding:0 12px;gap:8px}
+}
+
+.tab-body.single{grid-template-columns:1fr}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.panel h2{font-family:var(--font-head);font-size:15px;font-weight:700}
+.panel .sub-label{font-size:12px;color:var(--muted);margin-top:-8px}
+
+/* ── NETWORK / LOCATION BAR ── */
+.net-bar{padding:10px 14px;border-radius:9px;font-size:12px;font-weight:500}
+.net-bar.ok{background:rgba(29,158,117,.1);border:1px solid rgba(29,158,117,.25);color:var(--green)}
+.net-bar.bad{background:rgba(216,90,48,.1);border:1px solid rgba(216,90,48,.25);color:var(--red)}
+.net-bar.warn{background:rgba(239,159,39,.1);border:1px solid rgba(239,159,39,.25);color:var(--orange)}
+
+/* ── LOCATION STATUS BOX ── */
+.loc-status{padding:10px 14px;border-radius:9px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px}
+.loc-status.ok{background:rgba(29,158,117,.1);border:1px solid rgba(29,158,117,.25);color:var(--green)}
+.loc-status.bad{background:rgba(216,90,48,.1);border:1px solid rgba(216,90,48,.25);color:var(--red)}
+.loc-status.checking{background:rgba(107,114,128,.1);border:1px solid rgba(107,114,128,.25);color:var(--muted)}
+.loc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.loc-status.ok .loc-dot{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite}
+.loc-status.bad .loc-dot{background:var(--red)}
+.loc-status.checking .loc-dot{background:var(--muted)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── BUTTONS ── */
+.btn{padding:10px 16px;border:none;border-radius:9px;font-family:var(--font-head);font-size:13px;font-weight:600;cursor:pointer;transition:.2s;letter-spacing:.2px}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:var(--green-dark)}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-blue:hover{background:var(--blue-dark)}
+.btn-red{background:rgba(216,90,48,.15);border:1px solid rgba(216,90,48,.3);color:var(--red)}
+.btn-red:hover{background:rgba(216,90,48,.25)}
+.btn-gray{background:var(--card2);color:var(--text)}
+.btn-gray:hover{background:var(--border)}
+.btn-sm{padding:7px 12px;font-size:12px}
+.btn-full{width:100%}
+.btn-row{display:flex;gap:8px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── WEBCAM ── */
+.cam-wrap{position:relative;background:#000;border-radius:12px;overflow:hidden;aspect-ratio:4/3}
+.cam-wrap video{width:100%;height:100%;object-fit:cover}
+.cam-wrap canvas{position:absolute;top:0;left:0;width:100%;height:100%}
+.cam-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);flex-direction:column;gap:10px;font-size:13px;color:var(--muted)}
+.cam-overlay .icon{font-size:32px}
+
+/* ── LOG TABLE ── */
+.log-table{width:100%;border-collapse:collapse;font-size:12px}
+.log-table th{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
+.log-table td{padding:9px 10px;border-bottom:1px solid var(--border)}
+.log-table tr:last-child td{border-bottom:none}
+.log-table tr:hover td{background:rgba(255,255,255,.02)}
+.badge-present{background:rgba(29,158,117,.15);color:var(--green);padding:2px 8px;border-radius:20px;font-size:11px}
+
+/* ── FORM FIELDS ── */
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:5px;font-weight:500}
+.field input,.field select{width:100%;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--font-body);font-size:13px;outline:none;transition:.2s}
+.field input:focus,.field select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(29,158,117,.08)}
+.field input::placeholder{color:#3A3F4E}
+
+/* ── MSG ── */
+.msg-box{padding:9px 13px;border-radius:8px;font-size:12px;display:none}
+.msg-box.show{display:block}
+.msg-box.ok{background:rgba(29,158,117,.1);border:1px solid rgba(29,158,117,.25);color:var(--green)}
+.msg-box.err{background:rgba(216,90,48,.1);border:1px solid rgba(216,90,48,.25);color:var(--red)}
+
+/* ── DOWNLOAD CARDS ── */
+.dl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.dl-card{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px}
+.dl-card h3{font-family:var(--font-head);font-size:14px;font-weight:700;margin-bottom:4px}
+.dl-card p{font-size:11px;color:var(--muted);margin-bottom:12px}
+
+/* ── ACCOUNTS LIST ── */
+.acc-list{font-size:12px}
+.acc-row{display:grid;grid-template-columns:90px 1fr 110px;gap:8px;padding:9px 10px;border-bottom:1px solid var(--border)}
+.acc-row.header{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.3px}
+.acc-row:last-child{border-bottom:none}
+
+/* ── SECTION HDR ── */
+.section-hdr{font-family:var(--font-head);font-size:18px;font-weight:700;padding:16px 20px 0}
+.section-sub{font-size:12px;color:var(--muted);padding:2px 20px 0}
+
+/* ── SLIDER ── */
+.slider-group{display:flex;flex-direction:column;gap:6px}
+.slider-group label{font-size:12px;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--green)}
+.slider-val{font-size:11px;color:var(--muted)}
+
+/* ── EMPTY ── */
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:30px}
+
+/* ── HTTPS WARNING ── */
+.https-warn{background:rgba(239,159,39,.08);border:1px solid rgba(239,159,39,.3);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--orange);display:none}
+.https-warn.show{display:block}
+
+/* ══ DELETE FEATURE STYLES ══ */
+.bulk-action-bar{
+  display:none;align-items:center;gap:10px;
+  background:rgba(216,90,48,.08);border:1px solid rgba(216,90,48,.25);
+  border-radius:9px;padding:10px 14px;font-size:12px;
+}
+.bulk-action-bar.visible{display:flex}
+.bulk-action-bar span{color:#fca5a5;flex:1}
+
+.btn-del-row{
+  background:rgba(216,90,48,.1);border:1px solid rgba(216,90,48,.25);
+  color:var(--red);border-radius:7px;padding:4px 9px;
+  cursor:pointer;font-size:13px;transition:.2s;
+}
+.btn-del-row:hover{background:var(--red);color:#fff}
+
+.btn-del-all{
+  background:rgba(216,90,48,.12);border:1px solid rgba(216,90,48,.3);
+  color:var(--red);border-radius:9px;padding:10px 14px;
+  font-family:var(--font-head);font-size:12px;font-weight:600;
+  cursor:pointer;transition:.2s;white-space:nowrap;
+}
+.btn-del-all:hover{background:rgba(216,90,48,.25)}
+
+.modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
+  z-index:999;align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex}
+.modal-box{
+  background:#1C1F28;border:1px solid var(--border);
+  border-radius:16px;padding:28px;width:420px;max-width:92vw;
+}
+.modal-box h3{font-family:var(--font-head);font-size:16px;margin-bottom:8px}
+.modal-box p{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:22px}
+.modal-box p .hi{color:#fbbf24;font-weight:600}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end}
+
+.toast-notif{
+  position:fixed;bottom:24px;right:24px;
+  padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;
+  display:none;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.4);
+}
+.toast-notif.ok{background:var(--green);color:#fff}
+.toast-notif.err{background:var(--red);color:#fff}
+.toast-notif.show{display:block;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+input[type=checkbox]{accent-color:var(--red);width:14px;height:14px;cursor:pointer}
+.fade-in{animation:fadeIn .3s ease forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ══ -->
+<div class="topbar">
+  <button class="hamburger" onclick="toggleSidebar()" id="hamburger-btn" aria-label="Menu">☰</button>
+  <div class="logo">SA</div>
+  <h1>Smart Attendance</h1>
+  <span class="badge badge-live">● LIVE</span>
+  <span class="badge badge-admin" id="admin-badge">Admin</span>
+  <div class="topbar-right">
+    <span class="net-status" id="top-net">Checking...</span>
+    <span class="top-date" id="top-date"></span>
+    <button class="btn-logout" onclick="doLogout()">Logout</button>
+  </div>
+</div>
+
+<!-- ══ SIDEBAR ══ -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+<nav class="sidebar" id="sidebar-nav">
+  <div class="nav-section">Dashboard</div>
+  <button class="nav-btn active" onclick="showTab('live',this)"><span class="dot" style="background:var(--green)"></span>Live Attendance</button>
+  <button class="nav-btn" onclick="showTab('register',this)"><span class="dot" style="background:var(--blue)"></span>Register Face</button>
+  <div class="nav-section">Reports</div>
+  <button class="nav-btn" onclick="showTab('report',this)"><span class="dot" style="background:var(--orange)"></span>View Report</button>
+  <button class="nav-btn" onclick="showTab('download',this)"><span class="dot" style="background:var(--teal)"></span>Download CSV</button>
+  <div class="nav-section">System</div>
+  <button class="nav-btn" onclick="showTab('settings',this)"><span class="dot" style="background:var(--muted)"></span>Camera Settings</button>
+  <button class="nav-btn" onclick="showTab('offsettings',this)"><span class="dot" style="background:var(--orange)"></span>Office Settings</button>
+  <div class="nav-section">Accounts</div>
+  <button class="nav-btn" onclick="showTab('accounts',this)"><span class="dot" style="background:var(--purple)"></span>Manage Accounts</button>
+  <div class="sidebar-spacer"></div>
+  <button class="nav-btn nav-btn-danger" onclick="clearCSV()">🗑 Clear CSV</button>
+</nav>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+
+  <!-- ── LIVE TAB ── -->
+  <div class="tab active" id="tab-live">
+    <div class="stats-row">
+      <div class="stat-card"><div class="label">Present today</div><div class="val" id="s-present" style="color:var(--green)">0</div><div class="sub">out of registered</div></div>
+      <div class="stat-card"><div class="label">Absent</div><div class="val" id="s-absent" style="color:var(--red)">0</div><div class="sub">not seen yet</div></div>
+      <div class="stat-card"><div class="label">Unknown faces</div><div class="val" style="color:var(--muted)">–</div><div class="sub">unregistered</div></div>
+      <div class="stat-card"><div class="label">Registered</div><div class="val" id="s-registered" style="color:var(--blue)">0</div><div class="sub">total employees</div></div>
+    </div>
+
+    <div class="tab-body">
+      <div class="panel">
+        <h2>Live Attendance Log</h2>
+        <p class="sub-label">Face + GPS Location verified</p>
+        <div class="https-warn" id="https-warn">
+          ⚠️ <b>HTTP detected!</b> GPS works on only HTTP. SSL enable  <code>localhost</code> use it.
+        </div>
+        <div class="loc-status checking" id="loc-status-bar">
+          <span class="loc-dot"></span>
+          <span id="loc-status-text">📍 Location detected...</span>
+        </div>
+        <div class="cam-wrap" id="att-cam-wrap">
+          <video id="att-video" autoplay playsinline></video>
+          <div class="cam-overlay" id="att-overlay">
+            <div class="icon">📷</div>
+            <div>Camera Start </div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-green" onclick="startAttCam()">▶ Start Camera</button>
+          <button class="btn btn-red" onclick="stopAttCam()">■ Stop</button>
+          <button class="btn btn-gray" onclick="captureAttendance()">📸 Capture</button>
+          
+        </div>
+        <div class="msg-box" id="att-msg"></div>
+        <p style="font-size:11px;color:var(--muted)">Auto capture every 3 seconds when camera is running</p>
+        <div style="flex:1;overflow-y:auto">
+          <table class="log-table">
+            <thead><tr><th>Emp ID</th><th>Naam</th><th>IN</th><th>OUT</th><th>IP</th></tr></thead>
+            <tbody id="log-tbody"><tr><td colspan="5" class="empty">No record Found</td></tr></tbody>
+
+          </table>
+
+        </div>
+      </div>
+
+      <div class="panel">
+        
+        <div class="msg-box" id="reg-msg"></div>
+        <hr style="border-color:var(--border);margin:4px 0">
+        <h2>Download CSV</h2>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px">Today</span>
+            <button class="btn btn-green btn-sm" onclick="dlCSV('today')">Download</button>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px">This Month</span>
+            <button class="btn btn-blue btn-sm" onclick="dlCSV('month')">Download</button>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px">This Year</span>
+            <button class="btn btn-sm" style="background:var(--orange);color:#fff" onclick="dlCSV('year')">Download</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── REGISTER TAB ── -->
+  <div class="tab" id="tab-register">
+    <div class="section-hdr">Register Employee Face</div>
+    <div class="tab-body">
+      <div class="panel">
+        <h2>New Employee</h2>
+        <div class="field"><label>Employee ID</label><input type="text" id="r-empid" placeholder="EMP-001..."></div>
+        <div class="field"><label>Employee Name</label><input type="text" id="r-name" placeholder="Full Name..."></div>
+        <div class="cam-wrap" id="reg2-cam-wrap">
+          <video id="reg2-video" autoplay playsinline></video>
+          <div class="cam-overlay" id="reg2-overlay">
+            <div class="icon">🎥</div>
+            <div>Please enter button for open camera</div>
+            <div style="font-size:11px">See on camera and click capture button</div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-blue btn-full" onclick="openReg2Cam()">📷 Open Camera</button>
+          <button class="btn btn-green btn-full" onclick="captureReg2Face()" id="cap2-btn" disabled>📸 Capture & Save</button>
+        </div>
+        <div class="msg-box" id="reg2-msg"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Registered Employees</h2>
+        <div id="reg-list"><div class="empty">Loading...</div></div>
+        <hr style="border-color:var(--border)">
+        <h2 style="margin-top:4px">Delete Employee</h2>
+        <div class="field"><label>New Emp ID</label><input type="text" id="del-emp" placeholder="Name ya EMP-001..."></div>
+        <button class="btn btn-red btn-full" onclick="deleteEmployee()">Delete Employee</button>
+        <div class="msg-box" id="del-msg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       ── REPORT TAB ──
+       ══════════════════════════════════════ -->
+  <div class="tab" id="tab-report">
+    <div class="section-hdr">View Report</div>
+    <div class="tab-body single">
+      <div class="panel">
+
+        <!-- Filter Row -->
+        <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+          <div class="field" style="margin:0;flex:1;min-width:140px">
+            <label>Date</label>
+            <input type="date" id="report-date">
+          </div>
+          <div class="field" style="margin:0;min-width:130px">
+            <label>Choose Attendance Type </label>
+            <select id="report-type-filter" style="width:100%;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--font-body);font-size:13px;outline:none">
+              <option value="">All Types</option>
+              <option value="WFH">🏠 WFH</option>
+              <option value="WFO">🏢 WFO</option>
+              <option value="Field">🛠️ Field</option>
+            </select>
+          </div>
+          <button class="btn btn-green" onclick="loadReport()">Load</button>
+          <button class="btn btn-blue" onclick="dlCSV('custom')">Download CSV</button>
+          <button class="btn-del-all" onclick="confirmDeleteByDate()" id="btn-del-date" style="display:none">
+            🗑 Particular datewise delete data option
+          </button>
+        </div>
+
+        <!-- Bulk Action Bar -->
+        <div class="bulk-action-bar" id="bulk-bar">
+          <span id="bulk-count-text">0 records selected</span>
+          <button class="btn btn-gray btn-sm" onclick="clearSelection()">Cancel</button>
+          <button class="btn btn-red btn-sm" onclick="confirmBulkDelete()">🗑 Delete Selected</button>
+        </div>
+
+        <!-- Report Table -->
+        <div style="overflow-x:auto;flex:1">
+    <table class="log-table" id="report-table">
+            <thead>
+      <tr>
+                <th style="width:36px">
+                  <input type="checkbox" id="select-all-cb" onchange="toggleSelectAll(this)" title="All Select">
+                </th>
+                <th>Emp ID</th><th>Name</th><th>Date</th>
+                <th>IN</th><th>OUT</th><th>Status</th><th>Type</th><th>Method</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody id="report-tbody">
+              <tr><td colspan="8" class="empty">select date and load it</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="report-total" style="font-size:12px;color:var(--muted)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DOWNLOAD TAB ── -->
+  <div class="tab" id="tab-download">
+    <div class="section-hdr">Download Attendance CSV</div>
+    <div class="section-sub">Select period and download it</div>
+    <div style="padding:16px 20px">
+      <!-- Type Filter for Download -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <span style="font-size:13px;font-weight:600;font-family:var(--font-head)">Choose Attendance Filter :</span>
+        <select id="dl-type-filter" style="padding:8px 12px;background:var(--card2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:var(--font-body);font-size:13px;outline:none">
+          <option value="">Choose Attendance  Types</option>
+          <option value="WFH">🏠 WFH Only</option>
+          <option value="WFO">🏢 WFO Only</option>
+          <option value="Field">🛠️ Field Only</option>
+        </select>
+        <span style="font-size:12px;color:var(--muted)">This filter aplly all Download Button</span>
+      </div>
+      <div class="dl-grid">
+        <div class="dl-card">
+          <h3 style="color:var(--green)">Today</h3>
+          <p>Only Today attendance</p>
+          <button class="btn btn-green btn-full" onclick="dlCSV('today')">Download Today CSV</button>
+        </div>
+        <div class="dl-card">
+          <h3 style="color:var(--blue)">This Month</h3>
+          <p>Monthly attendence</p>
+          <button class="btn btn-blue btn-full" onclick="dlCSV('month')">Download Month CSV</button>
+        </div>
+        <div class="dl-card">
+          <h3 style="color:var(--orange)">This Year</h3>
+          <p>Yearly attendance</p>
+          <button class="btn btn-full" style="background:var(--orange);color:#fff" onclick="dlCSV('year')">Download Year CSV</button>
+        </div>
+        <div class="dl-card">
+          <h3 style="color:var(--teal)">Custom Date</h3>
+          <p>Chose Your date</p>
+          <input type="date" id="dl-custom-date" style="width:100%;padding:8px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);margin-bottom:10px;font-family:var(--font-body)">
+          <button class="btn btn-full" style="background:var(--teal);color:#fff" onclick="dlCSV('custom')">Download Custom CSV</button>
+        </div>
+        <div class="dl-card">
+          <h3 style="color:var(--muted)">All Time</h3>
+          <p>All history</p>
+          <button class="btn btn-gray btn-full" onclick="dlCSV('all')">Download All CSV</button>
+        </div>
+      </div>
+      <div class="msg-box" id="dl-msg" style="margin-top:14px"></div>
+    </div>
+  </div>
+
+  <!-- ── SETTINGS TAB ── -->
+  <div class="tab" id="tab-settings">
+    <div class="section-hdr">Camera & Location Settings</div>
+    <div style="padding:16px 20px;max-width:500px">
+      <div class="panel">
+        <div class="slider-group">
+          <label>Face Match Tolerance</label>
+          <input type="range" min="0.3" max="0.7" step="0.05" value="0.5" id="sl-tol" oninput="document.getElementById('tol-val').textContent=this.value">
+          <span class="slider-val" id="tol-val">0.5</span>
+          <span class="slider-val">0.3 = strict | 0.7 = loose</span>
+        </div>
+        <div class="slider-group">
+          <label>Auto Capture Interval (seconds)</label>
+          <input type="range" min="1" max="10" step="1" value="3" id="sl-interval" oninput="document.getElementById('int-val').textContent=this.value+'s'">
+          <span class="slider-val" id="int-val">3s</span>
+        </div>
+        <hr style="border-color:var(--border)">
+        <h2>📍 Office Location Info</h2>
+        <div id="office-loc-info" style="font-size:12px;color:var(--muted);line-height:1.8">Loading...</div>
+        <button class="btn btn-gray btn-sm" onclick="loadOfficeLocation()">🔄 Refresh</button>
+        <div style="margin-top:8px">
+          <div class="loc-status checking" id="settings-loc-bar" style="font-size:12px">
+            <span class="loc-dot"></span>
+            <span id="settings-loc-text">For location verify please check gps</span>
+          </div>
+        </div>
+        <button class="btn btn-blue btn-sm" onclick="testGPS()">📡 Test My GPS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ACCOUNTS TAB ── -->
+  <div class="tab" id="tab-accounts">
+    <div class="section-hdr">Manage Accounts</div>
+    <div class="tab-body">
+      <div class="panel">
+        <h2>➕ Create Employee Account</h2>
+        <div class="field"><label>Name</label><input type="text" id="a-name" placeholder="Full name..."></div>
+        <div class="field"><label>Employee ID</label><input type="text" id="a-empid" placeholder="EMP-001..."></div>
+        <div class="field"><label>Mobile</label><input type="tel" id="a-mobile" placeholder="10 digit..." maxlength="10"></div>
+        <div class="field"><label>Password</label><input type="password" id="a-pass" placeholder="Min 6 chars..."></div>
+        <button class="btn btn-green btn-full" onclick="createAccount()">Create Account</button>
+        <div class="msg-box" id="acc-msg"></div>
+        <hr style="border-color:var(--border);margin:8px 0">
+        <h2>⚙️ Admin Details Update</h2>
+        <div class="field"><label>New Mobile</label><input type="tel" id="adm-mobile" placeholder="New 10 digit..." maxlength="10"></div>
+        <button class="btn btn-blue btn-full" onclick="updateAdmin('mobile')">Update Mobile</button>
+        <div style="height:8px"></div>
+        <div class="field"><label>New Password</label><input type="password" id="adm-pass" placeholder="New password..."></div>
+        <div class="field"><label>Confirm Password</label><input type="password" id="adm-pass2" placeholder="Again Enter..."></div>
+        <button class="btn btn-full" style="background:var(--purple);color:#fff" onclick="updateAdmin('password')">Update Password</button>
+        <div class="msg-box" id="adm-msg"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Employee Accounts</h2>
+        <div id="acc-list-wrap" style="flex:1;overflow-y:auto"><div class="empty">Loading...</div></div>
+        <hr style="border-color:var(--border)">
+        <h2>Delete Account</h2>
+        <div class="field"><label>Mobile or Emp ID</label><input type="text" id="del-acc" placeholder="Mobile ya EMP-001..."></div>
+        <button class="btn btn-red btn-full" onclick="deleteAccount()">Delete Account</button>
+        <div class="msg-box" id="del-acc-msg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── OFFICE SETTINGS TAB ── -->
+  <div class="tab" id="tab-offsettings">
+    <div class="section-hdr">🏢 Office Settings</div>
+    <div class="section-sub">GPS location and WiFi subnet configure </div>
+    <div class="tab-body single" style="max-width:600px">
+      <div class="panel" style="gap:16px">
+        <h2>GPS Location</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">LATITUDE</label>
+            <input id="os-lat" type="number" step="any" style="width:100%;padding:9px 12px;background:#1C1F28;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">LONGITUDE</label>
+            <input id="os-lng" type="number" step="any" style="width:100%;padding:9px 12px;background:#1C1F28;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">RADIUS (meters)</label>
+            <input id="os-radius" type="number" min="10" style="width:100%;padding:9px 12px;background:#1C1F28;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+          </div>
+        </div>
+        <h2 style="margin-top:4px">WiFi — Office Public IP</h2>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px">Enter Exact public IP of Office</label>
+            <input id="os-subnet" placeholder="e.g. 103.21.124.56" style="width:100%;padding:9px 12px;background:#1C1F28;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;outline:none">
+            <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4">
+              💡 <b>Known our public IP:</b> office  WiFi  <a href="https://api.ipify.org" target="_blank" style="color:var(--blue)">api.ipify.org</a> visit karein.<br>
+              You want to Multiple IPs seprate this comma : <span style="color:var(--text)">103.21.124.56, 49.36.12.100</span>
+            </div>
+          </div>
+        <button onclick="saveOrgSettings()" style="align-self:flex-start;padding:10px 24px;background:var(--green);color:#fff;border:none;border-radius:9px;font-family:var(--font-head);font-weight:700;font-size:14px;cursor:pointer">Save Settings</button>
+        <div id="os-msg" style="font-size:13px;display:none;padding:8px 12px;border-radius:8px"></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══ CONFIRM MODAL ══ -->
+<div class="modal-overlay" id="del-modal">
+  <div class="modal-box">
+    <h3>⚠️ Confirm Delete</h3>
+    <p id="del-modal-msg">Are you sure ?</p>
+    <div class="modal-actions">
+      <button class="btn btn-gray" onclick="closeDelModal()">Cancel</button>
+      <button class="btn btn-red" id="del-modal-confirm-btn">Yes, Delete </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div class="toast-notif" id="toast-notif"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
+const user              = JSON.parse(sessionStorage.getItem('user') || '{}');
+let attStream           = null;
+let regStream           = null;
+let reg2Stream          = null;
+let autoCaptureInterval = null;
+let cachedLat           = null;
+let cachedLng           = null;
+let locWatcher          = null;
+
+// Report delete state
+let reportData      = [];   // loaded rows cache — ab _id bhi hoga
+let pendingDeleteFn = null;
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+document.getElementById('admin-badge').textContent = `Admin: ${user.name || ''}`;
+document.getElementById('top-date').textContent    = new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+document.getElementById('report-date').value       = new Date().toISOString().split('T')[0];
+document.getElementById('dl-custom-date').value    = new Date().toISOString().split('T')[0];
+
+checkHTTPS();
+startGPSWatcher();
+checkNetwork();
+loadStats();
+refreshLog();
+loadOfficeLocation();
+setInterval(loadStats, 8000);
+setInterval(checkNetwork, 10000);
+
+// ══════════════════════════════════════════════
+//  HTTPS CHECK
+// ══════════════════════════════════════════════
+function checkHTTPS() {
+  const isHTTPS     = location.protocol === 'https:';
+  const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (!isHTTPS && !isLocalhost) document.getElementById('https-warn').classList.add('show');
+}
+
+// ══════════════════════════════════════════════
+//  GPS WATCHER
+// ══════════════════════════════════════════════
+function startGPSWatcher() {
+  if (!navigator.geolocation) { updateLocBar('bad','❌ Not supported in browser gps'); return; }
+  updateLocBar('checking','📍 GPS Checking...');
+  locWatcher = navigator.geolocation.watchPosition(
+    async (pos) => {
+      cachedLat = pos.coords.latitude; cachedLng = pos.coords.longitude;
+      const res = await fetch('/api/location-status',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat:cachedLat,lng:cachedLng})}).then(r=>r.json()).catch(()=>null);
+      if (res?.in_office) {
+        updateLocBar('ok',`✓ IN Office  — ${res.distance}m  (limit: ${res.radius}m)`);
+        document.getElementById('top-net').textContent=`📍 In Office (${res.distance}m)`; document.getElementById('top-net').className='net-status ok';
+      } else {
+        const dist=res?.distance||'?',rad=res?.radius||'?';
+        updateLocBar('bad',`✗ Out of Office  — ${dist}m  (limit: ${rad}m)`);
+        document.getElementById('top-net').textContent=`📍 Out of Office (${dist}m)`; document.getElementById('top-net').className='net-status bad';
+      }
+    },
+    (err) => {
+      cachedLat=null; cachedLng=null;
+      let msg='❌ GPS Error: ';
+      switch(err.code){case 1:msg+='Permission denied';break;case 2:msg+='Location unavailable';break;case 3:msg+='Timeout';break;default:msg+=err.message}
+      updateLocBar('bad',msg);
+      document.getElementById('top-net').textContent='📍 GPS unavailable'; document.getElementById('top-net').className='net-status bad';
+    },
+    {enableHighAccuracy:true,maximumAge:10000,timeout:15000}
+  );
+}
+
+function updateLocBar(type,text) {
+  const bar=document.getElementById('loc-status-bar'),span=document.getElementById('loc-status-text');
+  if(!bar||!span)return;
+  bar.className=`loc-status ${type}`; span.textContent=text;
+}
+
+// ══════════════════════════════════════════════
+//  NETWORK CHECK
+// ══════════════════════════════════════════════
+async function checkNetwork() {
+  try {
+    const r=await fetch('/api/network-status', { credentials: 'include' }).then(r=>r.json());
+    if(!cachedLat){const el=document.getElementById('top-net');if(r.on_net){el.textContent=`WiFi: ${r.ip}`;el.className='net-status ok';}else{el.textContent='No office network';el.className='net-status bad';}}
+  } catch(e){}
+}
+
+// ══════════════════════════════════════════════
+//  OFFICE LOCATION
+// ══════════════════════════════════════════════
+async function loadOfficeLocation() {
+  const d=await fetch('/api/office-location').then(r=>r.json()).catch(()=>null);
+  const el=document.getElementById('office-loc-info');
+  if(d){el.innerHTML=`<b>Latitude:</b>  ${d.lat}<br><b>Longitude:</b> ${d.lng}<br><b>Radius:</b>    ${d.radius} meters`;}
+  else{el.textContent='Office location not loaded';}
+}
+
+async function testGPS() {
+  const bar=document.getElementById('settings-loc-bar'),span=document.getElementById('settings-loc-text');
+  bar.className='loc-status checking'; span.textContent='📡 GPS signal searching...';
+  if(!navigator.geolocation){bar.className='loc-status bad';span.textContent='❌ Browser GPS not support ';return;}
+  navigator.geolocation.getCurrentPosition(
+    async(pos)=>{
+      const lat=pos.coords.latitude,lng=pos.coords.longitude,acc=pos.coords.accuracy;
+      const res=await fetch('/api/location-status',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat,lng})}).then(r=>r.json()).catch(()=>null);
+      if(res?.in_office){bar.className='loc-status ok';span.textContent=`✓ In Office ! ${lat.toFixed(5)}, ${lng.toFixed(5)} | Accuracy: ${acc.toFixed(0)}m | Distance: ${res.distance}m`;}
+      else{bar.className='loc-status bad';span.textContent=`✗ Out of Office : ${lat.toFixed(5)}, ${lng.toFixed(5)} | ${res?.distance}m `;}
+    },
+    (err)=>{bar.className='loc-status bad';span.textContent=`❌ GPS Error (${err.code}): ${err.message}`;},
+    {enableHighAccuracy:true,timeout:15000}
+  );
+}
+
+// ══════════════════════════════════════════════
+//  TAB
+// ══════════════════════════════════════════════
+function showTab(key,btn) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+key).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  if(key==='register') loadRegList();
+  if(key==='accounts') loadAccountList();
+  // Close sidebar on mobile after selection
+  const sidebar = document.getElementById('sidebar-nav');
+  const overlay = document.getElementById('sidebar-overlay');
+  if(sidebar && window.innerWidth<=768){
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+  }
+}
+
+// ══════════════════════════════════════════════
+//  STATS
+// ══════════════════════════════════════════════
+async function loadStats() {
+  const d=await fetch('/api/stats', { credentials: 'include' }).then(r=>r.json()).catch(()=>null);
+
+  if(!d)return;
+  document.getElementById('s-present').textContent=d.present;
+  document.getElementById('s-absent').textContent=d.absent;
+  document.getElementById('s-registered').textContent=d.registered;
+}
+
+// ══════════════════════════════════════════════
+//  LIVE LOG
+// ══════════════════════════════════════════════
+async function refreshLog() {
+  const d=await fetch('/api/today-log').then(r=>r.json()).catch(()=>null);
+  if(!d)return;
+  const tbody=document.getElementById('log-tbody');
+  if(!d.rows.length){tbody.innerHTML='<tr><td colspan="5" class="empty">Today Not any Attendance</td></tr>';return;}
+  tbody.innerHTML=d.rows.map(r=>`<tr><td><b>${r.emp_id}</b></td><td>${r.name}</td><td>${r.in_time||'—'}</td><td>${r.out_time||'—'}</td><td style="color:var(--muted);font-size:11px">${r.ip_out || r.ip || ''}</td></tr>`).join('');
+
+}
+
+// ══════════════════════════════════════════════
+//  ATTENDANCE CAMERA
+// ══════════════════════════════════════════════
+async function startAttCam() {
+  if(!cachedLat||!cachedLng){
+    showMsg('att-msg','📍 GPS location not find — First allow location then waiting','err');
+    try{await new Promise((resolve,reject)=>{navigator.geolocation.getCurrentPosition(pos=>{cachedLat=pos.coords.latitude;cachedLng=pos.coords.longitude;resolve();},reject,{enableHighAccuracy:true,timeout:10000});});}
+    catch(e){showMsg('att-msg','📍 GPS permission : '+(e.message||'Location unavailable'),'err');return;}
+  }
+  try{
+    attStream=await navigator.mediaDevices.getUserMedia({video:true});
+    document.getElementById('att-video').srcObject=attStream;
+    document.getElementById('att-overlay').style.display='none';
+    const interval=(parseInt(document.getElementById('sl-interval').value)||3)*1000;
+    autoCaptureInterval=setInterval(captureAttendance,interval);
+    showMsg('att-msg','✓ Camera On — auto capture start','ok');
+  }catch(e){showMsg('att-msg','Camera not open: '+e.message,'err');}
+}
+
+function stopAttCam() {
+  if(attStream){attStream.getTracks().forEach(t=>t.stop());attStream=null;}
+  if(autoCaptureInterval){clearInterval(autoCaptureInterval);autoCaptureInterval=null;}
+  document.getElementById('att-overlay').style.display='flex';
+  refreshLog(); loadStats();
+}
+
+async function captureAttendance() {
+  if(!attStream)return;
+  let lat=cachedLat,lng=cachedLng;
+  if(!lat||!lng){
+    try{const pos=await new Promise((resolve,reject)=>{navigator.geolocation.getCurrentPosition(resolve,reject,{enableHighAccuracy:true,timeout:8000,maximumAge:15000});});lat=pos.coords.latitude;lng=pos.coords.longitude;cachedLat=lat;cachedLng=lng;}
+    catch(e){showMsg('att-msg','📍 GPS not find: '+e.message,'err');return;}
+  }
+  const vid=document.getElementById('att-video'),canvas=document.createElement('canvas');
+  canvas.width=vid.videoWidth;canvas.height=vid.videoHeight;
+  canvas.getContext('2d').drawImage(vid,0,0);
+  const image=canvas.toDataURL('image/jpeg',0.8);
+  const tol=parseFloat(document.getElementById('sl-tol').value)||0.5;
+  const res=await fetch('/api/mark-attendance',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image,tolerance:tol,lat,lng})}).then(r=>r.json()).catch(()=>null);
+  if(!res)return;
+  if(res.ok&&res.marked.length>0){
+    const names=res.marked.map(m=>m.status==='marked'?`✓ ${m.emp_id} | ${m.name}`:`⏭ Already: ${m.name}`).join(', ');
+    showMsg('att-msg',names,'ok');refreshLog();loadStats();
+  }else if(res.error){showMsg('att-msg',res.error,'err');}
+}
+
+// ══════════════════════════════════════════════
+//  REGISTER CAMERAS
+// ══════════════════════════════════════════════
+async function openRegCam() {
+  try{regStream=await navigator.mediaDevices.getUserMedia({video:true});document.getElementById('reg-video').srcObject=regStream;document.getElementById('reg-overlay').style.display='none';document.getElementById('cap-btn').disabled=false;}
+  catch(e){showMsg('reg-msg','Camera not open','err');}
+}
+async function captureRegFace() {
+  const empid=document.getElementById('q-empid').value.trim(),name=document.getElementById('q-name').value.trim();
+  if(!empid||!name){showMsg('reg-msg','Emp ID and Name required','err');return;}
+  if(!regStream){showMsg('reg-msg','Firstly Camera on','err');return;}
+  const vid=document.getElementById('reg-video'),canvas=document.createElement('canvas');
+  canvas.width=vid.videoWidth;canvas.height=vid.videoHeight;canvas.getContext('2d').drawImage(vid,0,0);
+  const image=canvas.toDataURL('image/jpeg',0.9);
+  showMsg('reg-msg','Processing...','ok');
+  const res=await fetch('/api/register-face',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({emp_id:empid,name,image})}).then(r=>r.json()).catch(()=>null);
+  if(res?.ok){showMsg('reg-msg',res.message,'ok');document.getElementById('q-empid').value='';document.getElementById('q-name').value='';if(regStream){regStream.getTracks().forEach(t=>t.stop());regStream=null;}document.getElementById('reg-overlay').style.display='flex';document.getElementById('cap-btn').disabled=true;loadStats();}
+  else{showMsg('reg-msg',res?.error||'Error ','err');}
+}
+async function openReg2Cam() {
+  try{reg2Stream=await navigator.mediaDevices.getUserMedia({video:true});document.getElementById('reg2-video').srcObject=reg2Stream;document.getElementById('reg2-overlay').style.display='none';document.getElementById('cap2-btn').disabled=false;}
+  catch(e){showMsg('reg2-msg','Camera not open','err');}
+}
+async function captureReg2Face() {
+  const empid=document.getElementById('r-empid').value.trim(),name=document.getElementById('r-name').value.trim();
+  if(!empid||!name){showMsg('reg2-msg','Emp ID and Name required','err');return;}
+  if(!reg2Stream){showMsg('reg2-msg','Firstly Open Camera ','err');return;}
+  const vid=document.getElementById('reg2-video'),canvas=document.createElement('canvas');
+  canvas.width=vid.videoWidth;canvas.height=vid.videoHeight;canvas.getContext('2d').drawImage(vid,0,0);
+  const image=canvas.toDataURL('image/jpeg',0.9);
+  showMsg('reg2-msg','Processing...','ok');
+  const res=await fetch('/api/register-face',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({emp_id:empid,name,image})}).then(r=>r.json()).catch(()=>null);
+  if(res?.ok){showMsg('reg2-msg',res.message,'ok');document.getElementById('r-empid').value='';document.getElementById('r-name').value='';if(reg2Stream){reg2Stream.getTracks().forEach(t=>t.stop());reg2Stream=null;}document.getElementById('reg2-overlay').style.display='flex';document.getElementById('cap2-btn').disabled=true;loadRegList();loadStats();}
+  else{showMsg('reg2-msg',res?.error||'Error ','err');}
+}
+
+// ══════════════════════════════════════════════
+//  REGISTERED LIST
+// ══════════════════════════════════════════════
+async function loadRegList() {
+  const d=await fetch('/api/registered-employees').then(r=>r.json()).catch(()=>null);
+  const wrap=document.getElementById('reg-list');
+  if(!d?.employees?.length){wrap.innerHTML='<div class="empty">Not anyone registered </div>';return;}
+  wrap.innerHTML=`<div class="acc-row header"><span>Emp ID</span><span>Name</span><span>Registered</span></div>${d.employees.map(e=>`<div class="acc-row"><span><b>${e.emp_id}</b></span><span>${e.name}</span><span style="color:var(--muted);font-size:11px">${e.registered_at||''}</span></div>`).join('')}`;
+}
+async function deleteEmployee() {
+  const q=document.getElementById('del-emp').value.trim();if(!q)return;
+  const res=await fetch('/api/delete-employee',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q})}).then(r=>r.json()).catch(()=>null);
+  if(res?.ok){showMsg('del-msg',res.message,'ok');document.getElementById('del-emp').value='';loadRegList();loadStats();}
+  else{showMsg('del-msg',res?.error||'Error','err');}
+}
+
+// ══════════════════════════════════════════════
+//  REPORT — LOAD  ← FIX: _id ab rows mein hoga
+// ══════════════════════════════════════════════
+async function loadReport() {
+  const date = document.getElementById('report-date').value;
+  const attType = document.getElementById('report-type-filter')?.value || '';
+  let url = `/api/report?date=${date}`;
+  if (attType) url += `&attendance_type=${attType}`;
+  const d    = await fetch(url).then(r=>r.json()).catch(()=>null);
+  const tbody = document.getElementById('report-tbody');
+  const total = document.getElementById('report-total');
+
+  document.getElementById('btn-del-date').style.display = 'none';
+  clearSelection();
+
+  if (!d?.rows?.length) {
+    reportData = [];
+    tbody.innerHTML = '<tr><td colspan="8" class="empty">Not Any Record</td></tr>';
+
+    total.textContent = '';
+    return;
+  }
+
+  reportData = d.rows;
+  document.getElementById('btn-del-date').style.display = 'inline-block';
+
+  const typeLabel = (t) => {
+    if(t==='WFH') return '<span style="background:rgba(29,158,117,.15);color:var(--green);padding:2px 7px;border-radius:10px;font-size:10px">🏠 WFH</span>';
+    if(t==='Field') return '<span style="background:rgba(239,159,39,.15);color:var(--orange);padding:2px 7px;border-radius:10px;font-size:10px">🛠️ Field</span>';
+    return '<span style="background:rgba(55,138,221,.15);color:var(--blue);padding:2px 7px;border-radius:10px;font-size:10px">🏢 WFO</span>';
+  };
+
+  tbody.innerHTML = reportData.map((r, i) => `
+    <tr id="report-row-${i}">
+      <td><input type="checkbox" class="row-cb" value="${i}" onchange="updateBulkBar()"></td>
+      <td><b>${r.emp_id}</b></td>
+      <td>${r.name}</td>
+      <td>${r.date}</td>
+      <td>${r.in_time||'—'}</td>
+      <td>${r.out_time||'—'}</td>
+      <td><span class="badge-present">${r.status||'Present'}</span></td>
+      <td>${typeLabel(r.attendance_type)}</td>
+      <td style="color:var(--muted);font-size:11px">${r.method||'—'}</td>
+      <td>
+
+
+        <button class="btn-del-row"
+          data-idx="${i}"
+          data-empid="${r.emp_id}"
+          data-naam="${r.name}"
+          data-mongoid="${r._id || ''}"
+          onclick="confirmSingleDelete(this)"
+          title="Delete">🗑</button>
+      </td>
+    </tr>`).join('');
+
+  total.textContent = `Total: ${reportData.length} records`;
+}
+
+// ══════════════════════════════════════════════
+//  REPORT — DELETE FUNCTIONS
+// ══════════════════════════════════════════════
+
+// 1. Single row delete — button element se data padhte hain
+function confirmSingleDelete(btn) {
+  const idx     = parseInt(btn.dataset.idx);
+  const empId   = btn.dataset.empid;
+  const naam    = btn.dataset.naam;
+  const mongoId = btn.dataset.mongoid;
+
+  document.getElementById('del-modal-msg').innerHTML =
+    `<span class="hi">${empId} — ${naam}</span> Do you want to delete record?<br>
+     <small style="color:var(--muted)">Not return this Action.</small>`;
+
+  pendingDeleteFn = () => deleteSingleRecord(idx, empId, mongoId);
+  document.getElementById('del-modal-confirm-btn').onclick = pendingDeleteFn;
+  openDelModal();
+}
+
+async function deleteSingleRecord(idx, empId, mongoId) {
+  closeDelModal();
+  const date = document.getElementById('report-date').value;
+
+  try {
+    // Pehle mongoId se try karo (zyada accurate), warna emp_id + date se
+    let url = mongoId
+      ? `/api/attendance/delete/${empId}?date=${date}&mongo_id=${mongoId}`
+      : `/api/attendance/delete/${empId}?date=${date}`;
+
+    const res = await fetch(url, { method: 'DELETE' }).then(r => r.json()).catch(() => null);
+
+    if (res?.ok || res?.deleted > 0) {
+      document.getElementById(`report-row-${idx}`)?.remove();
+      reportData[idx] = null;
+      showToast(`✅ ${empId}  record deleted`);
+      updateReportTotal();
+    } else {
+      showToast('❌ Delete not: ' + (res?.error || 'Server error'), 'err');
+    }
+  } catch (e) {
+    showToast('❌ Network error', 'err');
+  }
+  updateBulkBar();
+}
+
+// 2. Delete all records of selected date
+function confirmDeleteByDate() {
+  const date  = document.getElementById('report-date').value;
+  const count = reportData.filter(Boolean).length;
+
+  document.getElementById('del-modal-msg').innerHTML =
+    `<span class="hi">${date}</span> ke <span class="hi">saare ${count} records</span> want to delete?<br>
+     <small style="color:var(--muted)">Not return this action!</small>`;
+
+  pendingDeleteFn = () => deleteAllByDate(date);
+  document.getElementById('del-modal-confirm-btn').onclick = pendingDeleteFn;
+  openDelModal();
+}
+
+async function deleteAllByDate(date) {
+  closeDelModal();
+  try {
+    const res = await fetch(`/api/attendance/delete-by-date/${date}`, { method: 'DELETE' })
+      .then(r => r.json()).catch(() => null);
+    showToast(`✅ ${date} ke ${res?.deleted || 'Whole'} records delete `);
+  } catch {
+    showToast('❌Error in Delete ', 'err');
+  }
+  reportData = [];
+  document.getElementById('report-tbody').innerHTML = '<tr><td colspan="8" class="empty">Not any record</td></tr>';
+  document.getElementById('report-total').textContent = '';
+  document.getElementById('btn-del-date').style.display = 'none';
+  clearSelection();
+}
+
+// 3. Bulk delete (checkbox selected)
+function confirmBulkDelete() {
+  const selected = getSelectedIndices();
+  document.getElementById('del-modal-msg').innerHTML =
+    `<span class="hi">${selected.length} selected records</span> Want to delete?<br>
+     <small style="color:var(--muted)">Not return this action !</small>`;
+
+  pendingDeleteFn = () => bulkDeleteRecords(selected);
+  document.getElementById('del-modal-confirm-btn').onclick = pendingDeleteFn;
+  openDelModal();
+}
+
+async function bulkDeleteRecords(indices) {
+  closeDelModal();
+  const mongoIds = indices.map(i => reportData[i]?._id).filter(Boolean);
+
+  try {
+    if (mongoIds.length > 0) {
+      await fetch('/api/attendance/bulk-delete', {
+        method: 'DELETE',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({record_ids: mongoIds})
+      }).then(r => r.json()).catch(() => null);
+    }
+  } catch {}
+
+  indices.forEach(i => {
+    document.getElementById(`report-row-${i}`)?.remove();
+    reportData[i] = null;
+  });
+
+  showToast(`✅ ${indices.length} records deleted`);
+  clearSelection();
+  updateReportTotal();
+}
+
+// ── Helpers ──
+function getSelectedIndices() {
+  return [...document.querySelectorAll('.row-cb:checked')].map(cb => parseInt(cb.value));
+}
+
+function updateBulkBar() {
+  const count = getSelectedIndices().length;
+  const bar   = document.getElementById('bulk-bar');
+  bar.classList.toggle('visible', count > 0);
+  document.getElementById('bulk-count-text').textContent = `${count} record(s) selected`;
+}
+
+function toggleSelectAll(masterCb) {
+  document.querySelectorAll('.row-cb').forEach(cb => cb.checked = masterCb.checked);
+  updateBulkBar();
+}
+
+function clearSelection() {
+  document.querySelectorAll('.row-cb').forEach(cb => cb.checked = false);
+  const sa = document.getElementById('select-all-cb');
+  if (sa) sa.checked = false;
+  document.getElementById('bulk-bar')?.classList.remove('visible');
+}
+
+function updateReportTotal() {
+  const remaining = reportData.filter(Boolean).length;
+  document.getElementById('report-total').textContent = remaining > 0 ? `Total: ${remaining} records` : '';
+  if (remaining === 0) document.getElementById('btn-del-date').style.display = 'none';
+}
+
+// ── Modal helpers ──
+function openDelModal()  { document.getElementById('del-modal').classList.add('open'); }
+function closeDelModal() { document.getElementById('del-modal').classList.remove('open'); }
+document.getElementById('del-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('del-modal')) closeDelModal();
+});
+
+// ── Toast ──
+function showToast(msg, type='ok') {
+  const t = document.getElementById('toast-notif');
+  t.textContent = msg;
+  t.className = `toast-notif ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ══════════════════════════════════════════════
+//  DOWNLOAD CSV
+// ══════════════════════════════════════════════
+function dlCSV(period) {
+  let url=`/api/download-csv?period=${period}`;
+  if(period==='custom'){const d=document.getElementById('dl-custom-date')?.value||document.getElementById('report-date')?.value;url+=`&date=${d}`;}
+  // Include type filter from download tab or report tab
+  const dlType = document.getElementById('dl-type-filter')?.value || document.getElementById('report-type-filter')?.value || '';
+  if(dlType) url+=`&attendance_type=${dlType}`;
+  window.open(url,'_blank');
+}
+
+// ══════════════════════════════════════════════
+//  CLEAR CSV
+// ══════════════════════════════════════════════
+async function clearCSV() {
+  if(!confirm('Do You Want to Whole  attendance CSV clear ? Not in undo!'))return;
+  alert('CSV cleared! (Reload )');
+}
+
+// ══════════════════════════════════════════════
+//  ACCOUNTS
+// ══════════════════════════════════════════════
+async function loadAccountList() {
+  const d=await fetch('/api/accounts/list').then(r=>r.json()).catch(()=>null);
+  const wrap=document.getElementById('acc-list-wrap');
+  if(!d?.accounts?.length){wrap.innerHTML='<div class="empty">Not in any employee account </div>';return;}
+  wrap.innerHTML=`<div class="acc-row header"><span>Emp ID</span><span>Name</span><span>Mobile</span></div>${d.accounts.map(a=>`<div class="acc-row"><span><b>${a.emp_id}</b></span><span>${a.name}</span><span style="color:var(--muted)">${a.mobile}</span></div>`).join('')}`;
+}
+async function createAccount() {
+  const data={name:document.getElementById('a-name').value.trim(),emp_id:document.getElementById('a-empid').value.trim(),mobile:document.getElementById('a-mobile').value.trim(),password:document.getElementById('a-pass').value.trim()};
+  const res=await fetch('/api/accounts/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()).catch(()=>null);
+  if(res?.ok){showMsg('acc-msg',res.message,'ok');['a-name','a-empid','a-mobile','a-pass'].forEach(id=>document.getElementById(id).value='');loadAccountList();}
+  else{showMsg('acc-msg',res?.error||'Error','err');}
+}
+async function deleteAccount() {
+  const q=document.getElementById('del-acc').value.trim();if(!q)return;
+  const res=await fetch('/api/accounts/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q})}).then(r=>r.json()).catch(()=>null);
+  if(res?.ok){showMsg('del-acc-msg','Account deleted','ok');document.getElementById('del-acc').value='';loadAccountList();}
+  else{showMsg('del-acc-msg',res?.error||'Error','err');}
+}
+async function updateAdmin(type) {
+  let data={};
+  if(type==='mobile')data.mobile=document.getElementById('adm-mobile').value.trim();
+  if(type==='password'){const p1=document.getElementById('adm-pass').value.trim(),p2=document.getElementById('adm-pass2').value.trim();if(p1!==p2){showMsg('adm-msg','Password not match !','err');return;}data.password=p1;}
+  const res=await fetch('/api/accounts/update-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()).catch(()=>null);
+  if(res?.ok){showMsg('adm-msg',res.message,'ok');}else{showMsg('adm-msg',res?.error||'Error','err');}
+}
+
+// ══════════════════════════════════════════════
+//  LOGOUT
+// ══════════════════════════════════════════════
+async function loadOrgSettings() {
+  try {
+    const r = await fetch('/api/admin/org-settings');
+    const d = await r.json();
+    if (d.ok) {
+      document.getElementById('os-lat').value    = d.office_lat;
+      document.getElementById('os-lng').value    = d.office_lng;
+      document.getElementById('os-radius').value = d.office_radius_m;
+      document.getElementById('os-subnet').value = d.office_ip;
+    }
+  } catch(e) { console.error('Org settings load error', e); }
+}
+
+async function saveOrgSettings() {
+  const lat    = parseFloat(document.getElementById('os-lat').value);
+  const lng    = parseFloat(document.getElementById('os-lng').value);
+  const radius = parseFloat(document.getElementById('os-radius').value);
+  let subnet = document.getElementById('os-subnet').value.trim();
+  // Exact public IP save karo — koi modification nahi
+  subnet = subnet.replace(/\/.*/, '').trim(); // CIDR notation hato agar ho
+  const msg    = document.getElementById('os-msg');
+
+  const r = await fetch('/api/admin/org-settings', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({office_lat: lat, office_lng: lng, office_radius_m: radius, office_ip: subnet})
+  });
+  const d = await r.json();
+  msg.style.display = 'block';
+  if (d.ok) {
+    msg.style.background = 'rgba(29,158,117,.1)';
+    msg.style.color = 'var(--green)';
+    msg.style.border = '1px solid rgba(29,158,117,.3)';
+    msg.textContent = '✓ ' + d.message;
+  } else {
+    msg.style.background = 'rgba(216,90,48,.1)';
+    msg.style.color = 'var(--red)';
+    msg.style.border = '1px solid rgba(216,90,48,.3)';
+    msg.textContent = d.error;
+  }
+}
+
+// Load org settings when that tab opens
+const _origShowTab = window.showTab;
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    if (btn.textContent.includes('Office Settings')) {
+      btn.addEventListener('click', loadOrgSettings);
+    }
+  });
+});
+
+async function doLogout() {
+  if(locWatcher!==null)navigator.geolocation.clearWatch(locWatcher);
+  await fetch('/api/logout',{method:'POST', credentials:'include'});
+  sessionStorage.clear(); window.location.href='/';
+}
+
+function toggleSidebar() {
+  const sidebar  = document.getElementById('sidebar-nav');
+  const overlay  = document.getElementById('sidebar-overlay');
+  const isOpen   = sidebar.classList.contains('open');
+  sidebar.classList.toggle('open', !isOpen);
+  overlay.classList.toggle('open', !isOpen);
+}
+
+// ══════════════════════════════════════════════
+//  HELPER: showMsg
+// ══════════════════════════════════════════════
+function showMsg(id,msg,type) {
+  const el=document.getElementById(id);if(!el)return;
+  el.textContent=msg;el.className=`msg-box ${type} show`;
+  setTimeout(()=>el.classList.remove('show'),4000);
+}
+</script>
+</body>
+</html>

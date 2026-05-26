@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Attendance — Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#1D9E75;--green-dark:#0F6E56;--blue:#378ADD;--purple:#7C3AED;
+  --red:#D85A30;--bg:#0D0F14;--card:#161920;--border:#252830;
+  --text:#F0F2F5;--muted:#6B7280;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;opacity:.4;z-index:0}
+body::after{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 60% 40%,rgba(29,158,117,.08) 0%,transparent 60%),radial-gradient(ellipse at 30% 70%,rgba(55,138,221,.06) 0%,transparent 50%);z-index:0}
+.wrap{position:relative;z-index:1;width:100%;max-width:420px;padding:20px}
+.logo-block{text-align:center;margin-bottom:36px}
+.logo{width:56px;height:56px;background:var(--green);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:18px;font-weight:800;color:#fff;margin-bottom:14px;box-shadow:0 0 40px rgba(29,158,117,.3)}
+.logo-block h1{font-family:var(--font-head);font-size:24px;font-weight:700;letter-spacing:-.5px}
+.logo-block p{color:var(--muted);font-size:13px;margin-top:4px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px}
+.role-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:24px}
+.role-btn{padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-body);font-size:13px;font-weight:500;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:5px}
+.role-btn.active-admin{background:rgba(55,138,221,.12);border-color:var(--blue);color:var(--blue)}
+.role-btn.active-emp{background:rgba(29,158,117,.12);border-color:var(--green);color:var(--green)}
+.role-btn.active-super{background:rgba(124,58,237,.12);border-color:var(--purple);color:#A78BFA}
+.role-btn:hover:not([class*="active"]){border-color:var(--muted);color:var(--text)}
+.field-group{margin-bottom:14px}
+.field-group label{display:block;font-size:12px;color:var(--muted);font-weight:500;margin-bottom:6px;letter-spacing:.3px;text-transform:uppercase}
+.field-group input{width:100%;padding:12px 14px;background:#1C1F28;border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-body);font-size:14px;outline:none;transition:.2s}
+.field-group input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(29,158,117,.1)}
+.field-group input::placeholder{color:#3A3F4E}
+.slug-hint{font-size:11px;color:var(--muted);margin-top:5px}
+.slug-hint .ok{color:var(--green)}
+.slug-hint .err{color:var(--red)}
+.btn-primary{width:100%;padding:14px;border:none;border-radius:10px;font-family:var(--font-head);font-size:15px;font-weight:700;cursor:pointer;transition:.2s;margin-top:8px;letter-spacing:.3px}
+.btn-admin{background:var(--blue);color:#fff}
+.btn-admin:hover{background:#185FA5;transform:translateY(-1px)}
+.btn-emp{background:var(--green);color:#fff}
+.btn-emp:hover{background:var(--green-dark);transform:translateY(-1px)}
+.btn-super{background:var(--purple);color:#fff}
+.btn-super:hover{background:#6D28D9;transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none!important}
+.error-msg{background:rgba(216,90,48,.1);border:1px solid rgba(216,90,48,.3);color:var(--red);padding:10px 14px;border-radius:8px;font-size:13px;margin-top:12px;display:none}
+.error-msg.show{display:block}
+.link-row{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:10px}
+.link{font-size:12px;color:var(--muted);text-decoration:none;cursor:pointer}
+.link:hover{color:var(--text);text-decoration:underline}
+.form-subcard{margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:16px;background:rgba(0,0,0,.08);display:none}
+.form-subcard.show{display:block}
+.sub-title{font-size:13px;color:var(--text);font-weight:700;margin-bottom:12px;font-family:var(--font-head)}
+.small-actions{display:flex;gap:10px;margin-top:10px}
+.btn-secondary{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--muted);cursor:pointer;transition:.2s}
+.btn-secondary:hover{border-color:var(--muted);color:var(--text)}
+.fade-in{animation:fadeIn .4s ease forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.hidden{display:none !important}
+</style>
+</head>
+<body>
+<div class="wrap fade-in">
+  <div class="logo-block">
+    <div class="logo">SA</div>
+    <h1>Smart Attendance</h1>
+    <p>Multi-Company Attendance System</p>
+  </div>
+
+  <div class="card">
+    <div class="role-tabs">
+      <button class="role-btn active-admin" id="btn-admin" onclick="setRole('admin')">👑 Admin</button>
+      <button class="role-btn" id="btn-emp" onclick="setRole('employee')">👤 Employee</button>
+      <button class="role-btn" id="btn-super" onclick="setRole('super_admin')">🔑 Super</button>
+    </div>
+
+    <!-- Company slug — hidden for super_admin -->
+    <div class="field-group" id="slug-field">
+      <label>Company Code</label>
+      <input type="text" id="org-slug" placeholder="company-code" oninput="checkSlug(this.value)">
+      <div class="slug-hint" id="slug-hint">Enter our company slug </div>
+    </div>
+
+    <div class="field-group">
+      <label>Mobile Number</label>
+      <input type="tel" id="mobile" placeholder="10 digit mobile number" maxlength="10">
+    </div>
+
+    <div class="field-group">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+
+    <div class="link-row">
+<span class="link" id="forgot-link" onclick="window.location.href='/forgot-password'">Forgot password?</span>
+      <span class="link" id="back-link" style="display:none" onclick="hideForgot()">Back to login</span>
+    </div>
+
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">Login</button>
+    <div class="error-msg" id="error-msg"></div>
+
+    <!-- Forgot password form (No OTP) -->
+    <div class="form-subcard" id="forgot-card">
+      <div class="sub-title" id="forgot-title">Reset Password</div>
+
+      <div class="field-group" style="margin-bottom:10px; display:none" id="reset-name-wrap">
+        <label>Name</label>
+        <input type="text" id="reset-name" placeholder="Name" autocomplete="off">
+      </div>
+
+      <div class="field-group" style="margin-bottom:10px; display:none" id="reset-empid-wrap">
+        <label>Employee ID</label>
+        <input type="text" id="reset-empid" placeholder="emp_id" autocomplete="off">
+      </div>
+
+      <div class="field-group" style="margin-bottom:10px; display:none" id="reset-mobile-wrap">
+        <label>Mobile</label>
+        <input type="tel" id="reset-mobile" placeholder="10 digit mobile" maxlength="10" autocomplete="off">
+      </div>
+
+      <div class="field-group" style="margin-bottom:10px; display:none" id="reset-company-wrap">
+        <label>Company Code</label>
+        <input type="text" id="reset-org-slug" placeholder="company-code" autocomplete="off">
+      </div>
+
+      <div class="field-group" style="margin-bottom:10px; display:none" id="reset-name-mobile-wrap">
+        <label>Name</label>
+        <input type="text" id="reset-name2" placeholder="Name" autocomplete="off">
+      </div>
+
+      <div class="field-group" style="margin-bottom:10px; display:none" id="reset-name-mobile2-wrap">
+        <label>Mobile</label>
+        <input type="tel" id="reset-mobile2" placeholder="10 digit mobile" maxlength="10" autocomplete="off">
+      </div>
+
+      <div class="field-group" style="margin-bottom:10px;">
+        <label>New Password</label>
+        <input type="password" id="reset-password" placeholder="New password (6+ chars)">
+      </div>
+
+      <div class="small-actions">
+        <button class="btn-secondary" id="confirm-reset-btn" onclick="confirmResetDirect()">Update Password</button>
+      </div>
+
+      <div class="error-msg" style="margin-top:12px" id="forgot-msg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentRole = 'admin';
+let slugTimeout = null;
+
+function setRole(role) {
+  currentRole = role;
+
+  ['admin','emp','super'].forEach(r => {
+    const el = document.getElementById('btn-' + r);
+    if (el) el.className = 'role-btn';
+  });
+
+  const loginBtn = document.getElementById('login-btn');
+  const slugField = document.getElementById('slug-field');
+
+  if (role === 'admin') {
+    document.getElementById('btn-admin').className = 'role-btn active-admin';
+    loginBtn.className = 'btn-primary btn-admin';
+    loginBtn.textContent = 'Login as Admin';
+    slugField.style.display = '';
+  } else if (role === 'employee') {
+    document.getElementById('btn-emp').className = 'role-btn active-emp';
+    loginBtn.className = 'btn-primary btn-emp';
+    loginBtn.textContent = 'Login as Employee';
+    slugField.style.display = '';
+  } else {
+    document.getElementById('btn-super').className = 'role-btn active-super';
+    loginBtn.className = 'btn-primary btn-super';
+    loginBtn.textContent = 'Login as Super Admin';
+    slugField.style.display = 'none';
+  }
+
+  hideError();
+  updateForgotFields();
+  hideForgotMsg();
+}
+
+function checkSlug(val) {
+  clearTimeout(slugTimeout);
+  const hint = document.getElementById('slug-hint');
+  if (!val) { hint.innerHTML = 'Enter our company  code '; hint.className = 'slug-hint'; return; }
+  hint.textContent = 'Checking...';
+  slugTimeout = setTimeout(async () => {
+    try {
+      const r = await fetch(`/api/org-info?slug=${encodeURIComponent(val)}`);
+      const d = await r.json();
+      if (d.ok) hint.innerHTML = `<span class="ok">✓ ${d.name}</span>`;
+      else hint.innerHTML = `<span class="err">✗Not find Company </span>`;
+    } catch { hint.innerHTML = '<span class="err">Server error</span>'; }
+  }, 500);
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function hideError() { document.getElementById('error-msg').classList.remove('show'); }
+
+function showForgot() {
+  hideError();
+  updateForgotFields();
+  document.getElementById('forgot-card').classList.add('show');
+  document.getElementById('forgot-link').style.display = 'none';
+  document.getElementById('back-link').style.display = '';
+
+  document.getElementById('reset-password').value = '';
+  document.getElementById('reset-name').value = '';
+  document.getElementById('reset-empid').value = '';
+  document.getElementById('reset-mobile').value = '';
+  document.getElementById('reset-org-slug').value = '';
+
+  document.getElementById('forgot-msg').textContent = '';
+  document.getElementById('forgot-msg').classList.remove('show');
+}
+
+function hideForgot() {
+  document.getElementById('forgot-card').classList.remove('show');
+  document.getElementById('forgot-link').style.display = '';
+  document.getElementById('back-link').style.display = 'none';
+}
+
+function showForgotMsg(msg) {
+  const el = document.getElementById('forgot-msg');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function hideForgotMsg() { document.getElementById('forgot-msg').classList.remove('show'); }
+
+function updateForgotFields() {
+  // Employee: name + mobile + empid
+  // Admin: companyname(may map to org slug) + mobile + name
+  // Super admin: name + mobile
+  const nameWrap = document.getElementById('reset-name-wrap');
+  const empidWrap = document.getElementById('reset-empid-wrap');
+  const mobileWrap = document.getElementById('reset-mobile-wrap');
+  const companyWrap = document.getElementById('reset-company-wrap');
+
+  if (currentRole === 'employee') {
+    nameWrap.style.display = 'block';
+    empidWrap.style.display = 'block';
+    mobileWrap.style.display = 'block';
+    companyWrap.style.display = 'none';
+
+    document.getElementById('reset-name').placeholder = 'Name';
+    document.getElementById('reset-empid').placeholder = 'emp_id';
+    document.getElementById('reset-mobile').placeholder = '10 digit mobile';
+  } else if (currentRole === 'admin') {
+    // companyname: we ask for company code in this UI (same as slug)
+    nameWrap.style.display = 'block';
+    empidWrap.style.display = 'none';
+    mobileWrap.style.display = 'block';
+    companyWrap.style.display = 'block';
+
+    document.getElementById('reset-name').placeholder = 'Name';
+    document.getElementById('reset-mobile').placeholder = '10 digit mobile';
+    document.getElementById('reset-org-slug').placeholder = 'company-slug (code)';
+  } else {
+    // super_admin
+    nameWrap.style.display = 'block';
+    empidWrap.style.display = 'none';
+    mobileWrap.style.display = 'block';
+    companyWrap.style.display = 'none';
+
+    document.getElementById('reset-name').placeholder = 'Name';
+    document.getElementById('reset-mobile').placeholder = '10 digit mobile';
+  }
+}
+
+async function doLogin() {
+  const mobile = document.getElementById('mobile').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const slug = document.getElementById('org-slug').value.trim();
+  const btn = document.getElementById('login-btn');
+
+  if (!mobile || !password) { showError('Mobile and password fill'); return; }
+  if (mobile.length !== 10 || isNaN(mobile)) { showError('10 digit mobile number '); return; }
+  if (currentRole !== 'super_admin' && !slug) { showError('Enter Company code '); return; }
+
+  btn.textContent = '...';
+  btn.disabled = true;
+  hideError();
+
+  try {
+    const body = { mobile, password, role: currentRole };
+    if (currentRole !== 'super_admin') body.org_slug = slug;
+
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    const data = await res.json();
+
+    if (data.ok) {
+      sessionStorage.setItem('user', JSON.stringify(data));
+      if (data.role === 'super_admin') window.location.href = '/super-admin';
+      else if (data.role === 'admin') window.location.href = '/admin';
+      else window.location.href = '/employee';
+    } else {
+      showError(data.error || 'Login fail hua');
+      btn.disabled = false;
+      btn.textContent = currentRole === 'admin' ? 'Login as Admin' : currentRole === 'employee' ? 'Login as Employee' : 'Login as Super Admin';
+    }
+  } catch (e) {
+    showError('Not connect in server');
+    btn.disabled = false;
+    btn.textContent = 'Login';
+  }
+}
+
+async function confirmResetDirect() {
+  const newPass = document.getElementById('reset-password').value.trim();
+  if (!newPass || newPass.length < 6) { showForgotMsg('Password 6+ characters'); return; }
+
+  const btn = document.getElementById('confirm-reset-btn');
+  btn.disabled = true;
+  hideForgotMsg();
+
+  try {
+    let payload = { role: currentRole, password: newPass };
+
+    if (currentRole === 'employee') {
+      const name = document.getElementById('reset-name').value.trim();
+      const mobile = document.getElementById('reset-mobile').value.trim();
+      const empid = document.getElementById('reset-empid').value.trim();
+
+      if (!name) return showForgotMsg('Enter Name ');
+      if (!mobile || mobile.length !== 10 || isNaN(mobile)) return showForgotMsg('10 digit mobile No');
+      if (!empid) return showForgotMsg('Enter Employee ID ');
+
+      payload.name = name;
+      payload.mobile = mobile;
+      payload.emp_id = empid;
+
+    } else if (currentRole === 'admin') {
+      const name = document.getElementById('reset-name').value.trim();
+      const mobile = document.getElementById('reset-mobile').value.trim();
+      const org_slug = document.getElementById('reset-org-slug').value.trim();
+
+      if (!org_slug) return showForgotMsg('Enter Company code ');
+      if (!name) return showForgotMsg('Enter Name');
+      if (!mobile || mobile.length !== 10 || isNaN(mobile)) return showForgotMsg('10 digit mobile No');
+
+      payload.name = name;
+      payload.mobile = mobile;
+      payload.org_slug = org_slug;
+
+    } else {
+      const name = document.getElementById('reset-name').value.trim();
+      const mobile = document.getElementById('reset-mobile').value.trim();
+
+      if (!name) return showForgotMsg('Enter Name ');
+      if (!mobile || mobile.length !== 10 || isNaN(mobile)) return showForgotMsg('10 digit mobileNo');
+
+      payload.name = name;
+      payload.mobile = mobile;
+    }
+
+    const res = await fetch('/api/password-reset/direct', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (data.ok) {
+      showForgotMsg('Password updated! Login.');
+      document.getElementById('password').value = newPass;
+      hideForgot();
+    } else {
+      showForgotMsg(data.error || 'Reset fail ');
+    }
+  } catch (e) {
+    showForgotMsg('Server error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// init
+setRole('admin');
+</script>
+</body>
+</html>
+

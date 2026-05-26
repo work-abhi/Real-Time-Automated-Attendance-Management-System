@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Admin — Smart Attendance SaaS</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#1D9E75;--green-dark:#0F6E56;--blue:#378ADD;--purple:#7C3AED;
+  --red:#D85A30;--bg:#0D0F14;--card:#161920;--border:#252830;
+  --text:#F0F2F5;--muted:#6B7280;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh}
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:var(--font-head);font-weight:800;font-size:18px;display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;background:var(--purple);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.badge{background:rgba(124,58,237,.15);color:#A78BFA;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;border:1px solid rgba(124,58,237,.3)}
+.btn-logout{padding:8px 18px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-body);cursor:pointer;font-size:13px;transition:.2s}
+.btn-logout:hover{color:var(--red);border-color:var(--red)}
+
+.container{max-width:1200px;margin:0 auto;padding:32px 24px}
+h2{font-family:var(--font-head);font-size:22px;font-weight:700;margin-bottom:24px}
+
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:36px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px}
+.stat-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.stat-val{font-family:var(--font-head);font-size:32px;font-weight:800}
+.stat-val.green{color:var(--green)}
+.stat-val.blue{color:var(--blue)}
+.stat-val.purple{color:#A78BFA}
+.stat-val.orange{color:#F59E0B}
+
+/* Create org form */
+.section{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:28px}
+.section-title{font-family:var(--font-head);font-size:16px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;font-weight:500}
+.field input,.field select{padding:10px 14px;background:#1C1F28;border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-body);font-size:14px;outline:none;transition:.2s}
+.field input:focus,.field select:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(124,58,237,.1)}
+.field select option{background:#1C1F28}
+.btn{padding:10px 24px;border-radius:10px;border:none;font-family:var(--font-head);font-size:14px;font-weight:700;cursor:pointer;transition:.2s;letter-spacing:.3px}
+.btn-purple{background:var(--purple);color:#fff}
+.btn-purple:hover{background:#6D28D9;transform:translateY(-1px)}
+.btn-red{background:rgba(216,90,48,.15);color:var(--red);border:1px solid rgba(216,90,48,.3)}
+.btn-red:hover{background:rgba(216,90,48,.25)}
+.btn-green{background:rgba(29,158,117,.15);color:var(--green);border:1px solid rgba(29,158,117,.3)}
+.btn-green:hover{background:rgba(29,158,117,.25)}
+.msg{margin-top:14px;padding:10px 14px;border-radius:8px;font-size:13px;display:none}
+.msg.ok{background:rgba(29,158,117,.1);border:1px solid rgba(29,158,117,.3);color:var(--green);display:block}
+.msg.err{background:rgba(216,90,48,.1);border:1px solid rgba(216,90,48,.3);color:var(--red);display:block}
+
+/* Orgs table */
+.orgs-table{width:100%;border-collapse:collapse}
+.orgs-table th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.orgs-table td{padding:12px 14px;border-bottom:1px solid rgba(37,40,48,.6);font-size:14px;vertical-align:middle}
+.orgs-table tr:last-child td{border-bottom:none}
+.orgs-table tr:hover td{background:rgba(255,255,255,.02)}
+.status-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.status-active{background:rgba(29,158,117,.15);color:var(--green);border:1px solid rgba(29,158,117,.3)}
+.status-inactive{background:rgba(107,114,128,.1);color:var(--muted);border:1px solid var(--border)}
+.slug-pill{background:#1C1F28;border:1px solid var(--border);padding:2px 8px;border-radius:6px;font-size:11px;font-family:monospace;color:var(--muted)}
+.actions{display:flex;gap:8px}
+.btn-sm{padding:5px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:.2s}
+.btn-sm-toggle-on{background:rgba(216,90,48,.1);color:var(--red);border-color:rgba(216,90,48,.3)}
+.btn-sm-toggle-off{background:rgba(29,158,117,.1);color:var(--green);border-color:rgba(29,158,117,.3)}
+.btn-sm-del{background:rgba(216,90,48,.05);color:#ef4444;border-color:rgba(239,68,68,.2)}
+.btn-sm-del:hover{background:rgba(239,68,68,.15)}
+.empty{text-align:center;padding:40px;color:var(--muted);font-size:14px}
+
+@media(max-width:700px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .form-grid{grid-template-columns:1fr}
+  .container{padding:16px 12px}
+  .section{padding:16px}
+
+  /* Mobile tables */
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .table-scroll table{min-width:700px}
+
+  /* Make action buttons easier to tap */
+  .actions{gap:10px;flex-wrap:wrap}
+  .btn-sm{padding:8px 12px;font-size:12px}
+
+  .topbar{padding:0 14px;flex-wrap:wrap;height:auto;min-height:54px}
+  .logo{font-size:13px;gap:8px}
+  .btn-logout{padding:6px 12px;font-size:11px}
+}
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">👑</div>
+    Smart Attendance SaaS
+    <span class="badge">Super Admin</span>
+  </div>
+  <button class="btn-logout" onclick="doLogout()">Logout</button>
+</div>
+
+<div class="container">
+
+  <!-- Stats -->
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total Companies</div><div class="stat-val purple" id="s-total">—</div></div>
+    <div class="stat-card"><div class="stat-label">Active Companies</div><div class="stat-val green" id="s-active">—</div></div>
+    <div class="stat-card"><div class="stat-label">Total Employees</div><div class="stat-val blue" id="s-users">—</div></div>
+    <div class="stat-card"><div class="stat-label">Today's Attendance</div><div class="stat-val orange" id="s-today">—</div></div>
+  </div>
+
+  <!-- Create Org -->
+  <div class="section">
+    <div class="section-title">🏢 Add New Company</div>
+    <div class="form-grid">
+      <div class="field"><label>Company Name</label><input id="f-org-name" placeholder="e.g. Ardhnarishvar It"></div>
+
+      
+
+      <div class="field"><label>Admin Name</label><input id="f-admin-name" placeholder="Admin Name"></div>
+      <div class="field"><label>Admin Mobile</label><input id="f-admin-mobile" placeholder="10 digit mobile" maxlength="10"></div>
+      <div class="field"><label>Admin Password</label><input id="f-admin-pass" type="password" placeholder="Min 6 characters"></div>
+    </div>
+    <button type="button" class="btn btn-purple" style="margin-top:16px" onclick="createOrg(this)">+ Create Company </button>
+    <div class="msg" id="create-msg"></div>
+  </div>
+
+  <!-- Super Admin Update -->
+  <div class="section">
+    <div class="section-title">🛡️ Super Admin Account Update</div>
+    <div class="form-grid">
+      <div class="field"><label>Super Admin Name</label><input id="me-name" type="name" placeholder="enter name"></div>
+      <div class="field"><label>New Mobile</label><input id="me-mobile" placeholder="10 digit mobile" maxlength="10"></div>
+      <div class="field"><label>New Password</label><input id="me-pass" type="password" placeholder="Min 6 characters"></div>
+    </div>
+    <button class="btn btn-green" style="margin-top:16px" onclick="updateSuperMe()">Update</button>
+    <div class="msg" id="me-msg"></div>
+  </div>
+
+ 
+
+  <!-- Date-wise Report -->
+  <div class="section">
+    <div class="section-title">📅 Company Data (Date-wise)</div>
+    <div class="form-grid">
+      <div class="field"><label>Company Name</label><select id="dr-org"></select></div>
+      <div class="field"><label>Date</label><input type="date" id="dr-date"></div>
+      <div class="field">
+        <label>Choose Attendance Type</label>
+        <select id="dr-type" style="width:100%;padding:10px 12px;background:var(--card2,#1C1F28);border:1px solid var(--border,#252830);border-radius:9px;color:var(--text,#F0F2F5);font-family:inherit;font-size:13px;outline:none">
+          <option value="">All Types</option>
+          <option value="WFH">🏠 WFH</option>
+          <option value="WFO">🏢 WFO</option>
+          <option value="Field">🛠️ Field</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-purple" style="margin-top:16px" onclick="loadOrgDatewise()">Load</button>
+    <div class="msg" id="dr-msg"></div>
+
+    <div class="table-scroll" style="margin-top:18px">
+      <table class="orgs-table" style="min-width:960px">
+        <thead>
+          <tr>
+            <th>Emp ID</th><th>Name</th><th>Date</th><th>IN</th><th>OUT</th><th>Status</th><th>Type</th><th>Method</th><th>IP</th>
+          </tr>
+        </thead>
+        <tbody id="dr-tbody">
+          <tr><td colspan="9" class="empty">Select company + date</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Orgs List -->
+  <div class="section">
+    <div class="section-title" style="justify-content:space-between">
+      <span>📋 Total Companies</span>
+      <button class="btn btn-green" onclick="loadOrgs()" style="padding:6px 14px;font-size:12px">↻ Refresh</button>
+    </div>
+    <div id="orgs-container">
+      <div class="empty">Loading...</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+async function loadStats() {
+  const r = await fetch('/api/super/stats');
+  const d = await r.json();
+  if (d.ok) {
+    document.getElementById('s-total').textContent  = d.total_orgs;
+    document.getElementById('s-active').textContent = d.active_orgs;
+    document.getElementById('s-users').textContent  = d.total_users;
+    document.getElementById('s-today').textContent  = d.today_records;
+  }
+}
+
+async function loadOrgs() {
+  const r = await fetch('/api/super/orgs');
+  const d = await r.json();
+  const el = document.getElementById('orgs-container');
+  if (!d.ok || !d.orgs.length) {
+    el.innerHTML = '<div class="empty">Not find any company.Add this.</div>';
+    return;
+  }
+  el.innerHTML = `
+    <table class="orgs-table">
+      <thead><tr>
+        <th>Company Name</th><th>Admin</th><th>Company Code</th><th>Employees</th><th>Status</th><th>Created</th><th>Actions</th>
+      </tr></thead>
+
+      <tbody>
+        ${d.orgs.map(o => `
+        <tr>
+          <td><strong>${o.name}</strong></td>
+          <td>${o.admin_name || '—'}<br><small style="color:var(--muted)">${o.admin_mobile || ''}</small></td>
+          <td><span class="slug-pill">${o.slug || ''}</span></td>
+
+          <td style="text-align:center">${o.employee_count}</td>
+          <td><span class="status-badge ${o.active ? 'status-active' : 'status-inactive'}">${o.active ? 'Active' : 'Inactive'}</span></td>
+          <td style="color:var(--muted);font-size:12px">${o.created || '—'}</td>
+          <td><div class="actions">
+            <button class="btn-sm ${o.active ? 'btn-sm-toggle-on' : 'btn-sm-toggle-off'}" onclick="toggleOrg('${o._id}','${o.name}')">${o.active ? 'Deactivate' : 'Activate'}</button>
+            <button class="btn-sm btn-sm-del" onclick="deleteOrg('${o._id}','${o.name}')">Delete</button>
+          </div></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+async function createOrg(btn) {
+  const name     = document.getElementById('f-org-name').value.trim();
+  // This template doesn't include a plan input. Backend already defaults to "basic".
+
+  const aname    = document.getElementById('f-admin-name').value.trim();
+  const amobile  = document.getElementById('f-admin-mobile').value.trim();
+  const apass    = document.getElementById('f-admin-pass').value.trim();
+  const msg      = document.getElementById('create-msg');
+  msg.className  = 'msg';
+
+  if (!name || !aname || !amobile || !apass) {
+    msg.className = 'msg err'; msg.textContent = 'Fill total field'; return;
+  }
+
+  btn.textContent = '...'; btn.disabled = true;
+  const r = await fetch('/api/super/orgs/create', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({org_name: name, admin_name: aname, admin_mobile: amobile, admin_password: apass})
+
+  });
+  const d = await r.json();
+  btn.textContent = '+ Create Company '; btn.disabled = false;
+
+  if (d.ok) {
+    msg.className  = 'msg ok';
+    msg.textContent = `✓ "${name}" create Done!`;
+    document.getElementById('f-org-name').value = '';
+    document.getElementById('f-admin-name').value = '';
+    document.getElementById('f-admin-mobile').value = '';
+    document.getElementById('f-admin-pass').value = '';
+    loadOrgs(); loadStats();
+  } else {
+    msg.className = 'msg err'; msg.textContent = d.error;
+  }
+}
+
+async function toggleOrg(id, name) {
+  if (!confirm(`"${name}"  toggle ?`)) return;
+  const r = await fetch(`/api/super/orgs/${id}/toggle`, {method: 'POST'});
+  const d = await r.json();
+  if (d.ok) { loadOrgs(); loadStats(); }
+}
+
+async function deleteOrg(id, name) {
+  if (!confirm(`"${name}" Delete all DATA ?No undo !`)) return;
+  const r = await fetch(`/api/super/orgs/${id}`, {method: 'DELETE'});
+  const d = await r.json();
+  if (d.ok) { loadOrgs(); loadStats(); }
+  else alert(d.error);
+}
+
+async function doLogout() {
+  await fetch('/api/logout', {method: 'POST'});
+  window.location.href = '/';
+}
+
+loadStats();
+loadOrgs();
+
+// Super-admin helper: fill company dropdowns
+async function loadCompanyDropdowns() {
+  const r = await fetch('/api/super/orgs');
+  const d = await r.json();
+  if (!d.ok) return;
+
+  const orgs = d.orgs || [];
+
+  const fillSelect = (id, valueField = '_id', textFn = (o) => o.name) => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Select</option>' + orgs.map(o => {
+      const val = o[valueField];
+      return `<option value="${val}">${textFn(o)}</option>`;
+    }).join('');
+  };
+
+  // Only fill elements that actually exist on this page.
+  // (This template currently doesn't include the cs-* settings form.)
+  fillSelect('dr-org', '_id', (o) => o.name);
+
+  if (orgs.length) {
+    const drDate = document.getElementById('dr-date');
+    const drOrg  = document.getElementById('dr-org');
+
+    if (drDate) drDate.value = new Date().toISOString().split('T')[0];
+    if (drOrg)  drOrg.value  = orgs[0]._id;
+  }
+}
+
+async function updateSuperMe() {
+  const mobile = (document.getElementById('me-mobile').value || '').trim();
+  const pass   = (document.getElementById('me-pass').value || '').trim();
+  const msgEl  = document.getElementById('me-msg');
+
+  msgEl.className = 'msg';
+  if (!mobile && !pass) {
+    msgEl.className = 'msg err';
+    msgEl.textContent = 'Enter Mobile And password ';
+    return;
+  }
+
+  const r = await fetch('/api/super/me', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({mobile, password: pass})
+  });
+  const d = await r.json();
+
+  if (d.ok) {
+    msgEl.className = 'msg ok';
+    msgEl.textContent = d.message;
+    document.getElementById('me-mobile').value = '';
+    document.getElementById('me-pass').value = '';
+  } else {
+    msgEl.className = 'msg err';
+    msgEl.textContent = d.error || 'Error';
+  }
+}
+
+async function saveCompanySettings() {
+  const orgId  = document.getElementById('cs-org').value;
+  const name   = document.getElementById('cs-name').value.trim();
+
+  const lat    = document.getElementById('cs-lat').value;
+  const lng    = document.getElementById('cs-lng').value;
+  const radius = document.getElementById('cs-radius').value;
+  const subnet = document.getElementById('cs-subnet').value.trim();
+  const msgEl  = document.getElementById('cs-msg');
+
+  msgEl.className = 'msg';
+
+  if (!orgId) {
+    msgEl.className = 'msg err';
+    msgEl.textContent = 'Select Company ';
+    return;
+  }
+
+  const body = {
+    name: name || undefined,
+
+  };
+
+  if (lat) body.office_lat = parseFloat(lat);
+  if (lng) body.office_lng = parseFloat(lng);
+  if (radius) body.office_radius_m = parseFloat(radius);
+  if (subnet) body.office_subnet = subnet;
+
+  const r = await fetch(`/api/super/orgs/${orgId}/settings`, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(body)
+  });
+  const d = await r.json();
+
+  if (d.ok) {
+    msgEl.className = 'msg ok';
+    msgEl.textContent = d.message;
+  } else {
+    msgEl.className = 'msg err';
+    msgEl.textContent = d.error || 'Error';
+  }
+}
+
+async function loadOrgDatewise() {
+  const orgId   = document.getElementById('dr-org').value;
+  const date    = document.getElementById('dr-date').value;
+  const attType = document.getElementById('dr-type')?.value || '';
+  const msgEl   = document.getElementById('dr-msg');
+
+  msgEl.className = 'msg';
+
+  if (!orgId || !date) {
+    msgEl.className = 'msg err';
+    msgEl.textContent = 'Choose Company and date ';
+    return;
+  }
+
+  let url = `/api/super/orgs/${orgId}/report?date=${encodeURIComponent(date)}`;
+  if (attType) url += `&attendance_type=${attType}`;
+  const r = await fetch(url);
+  const d = await r.json();
+
+  if (!d.ok) {
+    msgEl.className = 'msg err';
+    msgEl.textContent = d.error || 'Error';
+    return;
+  }
+
+  const rows = d.rows || [];
+
+  const typeLabel = (t) => {
+    if(t==='WFH') return '<span style="background:rgba(29,158,117,.15);color:#1D9E75;padding:2px 7px;border-radius:10px;font-size:10px">🏠 WFH</span>';
+    if(t==='Field') return '<span style="background:rgba(239,159,39,.15);color:#EF9F27;padding:2px 7px;border-radius:10px;font-size:10px">🛠️ Field</span>';
+    return '<span style="background:rgba(55,138,221,.15);color:#378ADD;padding:2px 7px;border-radius:10px;font-size:10px">🏢 WFO</span>';
+  };
+
+  const tbody = document.getElementById('dr-tbody');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="9" class="empty">No records</td></tr>';
+    msgEl.className = 'msg ok';
+    msgEl.textContent = `${date} — Not get the date`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(r => {
+    const method = r.method || '—';
+    const ip = r.ip_out || r.ip || '—';
+    return `
+      <tr>
+        <td><b>${r.emp_id}</b></td>
+        <td>${r.name || ''}</td>
+        <td>${r.date}</td>
+        <td>${r.in_time || '—'}</td>
+        <td>${r.out_time || '—'}</td>
+        <td>${r.status || ''}</td>
+        <td>${typeLabel(r.attendance_type)}</td>
+        <td>${method}</td>
+        <td style="color:var(--muted);font-size:12px">${ip}</td>
+      </tr>`;
+  }).join('');
+
+  msgEl.className = 'msg ok';
+  msgEl.textContent = `${rows.length} records found`;
+}
+
+// init dropdowns
+loadCompanyDropdowns();
+</script>
+</body>
+</html>

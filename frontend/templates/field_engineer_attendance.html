@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Engineer Attendance</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --green:#1D9E75;--green-dark:#0F6E56;
+  --blue:#378ADD;--blue-dark:#185FA5;
+  --red:#D85A30;
+  --amber:#F59E0B;
+  --bg:#0D0F14;--card:#161920;--card2:#1C1F28;--border:#252830;
+  --text:#F0F2F5;--muted:#6B7280;
+  --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;display:flex;flex-direction:column}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;opacity:.3;z-index:0}
+.topbar{position:relative;z-index:10;background:rgba(17,19,24,.92);border-bottom:1px solid var(--border);padding:0 20px;height:54px;display:flex;align-items:center;gap:12px;backdrop-filter:blur(12px)}
+.logo{width:34px;height:34px;background:var(--amber);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:12px;font-weight:800;color:#fff}
+.topbar h1{font-family:var(--font-head);font-size:15px;font-weight:700}
+.badge{padding:3px 10px;background:rgba(245,158,11,.2);color:var(--amber);border-radius:20px;font-size:11px;font-weight:600}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.btn-back{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-family:var(--font-body);font-size:12px;cursor:pointer;transition:.2s;text-decoration:none;display:flex;align-items:center;gap:5px}
+.btn-back:hover{border-color:var(--amber);color:var(--amber)}
+.content{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;gap:16px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px;width:100%;max-width:520px}
+.title{font-family:var(--font-head);font-size:18px;font-weight:700;margin-bottom:6px}
+.sub{font-size:13px;color:var(--muted);line-height:1.5}
+
+.details{display:none;background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:16px;width:100%;max-width:520px;flex-direction:column;gap:10px}
+.details.show{display:flex}
+.row{display:flex;gap:10px;align-items:flex-start}
+.i{font-size:16px;flex-shrink:0;margin-top:1px}
+.info .lbl{font-size:11px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.info .val{font-size:13px;font-weight:600;margin-top:2px;word-break:break-word}
+
+.btn{width:100%;max-width:520px;padding:15px;border:none;border-radius:14px;cursor:pointer;transition:.25s;font-family:var(--font-head);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.btn-detect{background:linear-gradient(135deg,var(--amber),#D97706);color:#fff}
+.btn-detect:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(245,158,11,.35)}
+
+.btn-mark{background:linear-gradient(135deg,var(--green),var(--green-dark));color:#fff;display:none}
+.btn-mark.show{display:flex}
+.btn-mark:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(29,158,117,.35)}
+
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.result{width:100%;max-width:520px;border-radius:14px;padding:18px 20px;display:none;flex-direction:column;gap:6px}
+.result.show{display:flex}
+.result.success{background:rgba(29,158,117,.12);border:1px solid rgba(29,158,117,.35)}
+.result.fail{background:rgba(216,90,48,.1);border:1px solid rgba(216,90,48,.3)}
+.r-title{font-family:var(--font-head);font-size:15px;font-weight:700}
+.result.success .r-title{color:var(--green)}
+.result.fail .r-title{color:var(--red)}
+.r-msg{font-size:12px;color:var(--muted);line-height:1.5}
+
+.fade-in{animation:fadeIn .4s ease forwards}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.type-section{width:100%;max-width:520px;display:none}
+.type-label{font-family:var(--font-head);font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px}
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.type-btn{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:12px 10px;cursor:pointer;transition:.2s;font-family:var(--font-body);font-size:12px;font-weight:700;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:6px}
+.type-btn .t-icon{font-size:20px}
+.type-btn.active{border-color:var(--amber);background:rgba(245,158,11,.1);color:var(--amber)}
+.type-btn:hover{border-color:var(--amber);color:var(--amber)}
+
+.today-log{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 18px;width:100%;max-width:520px}
+.today-log h3{font-family:var(--font-head);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px}
+.log-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)}
+.log-row:last-child{border:none}
+.log-row .lbl{font-size:12px;color:var(--muted)}
+.log-row .val{font-size:12px;font-weight:600;max-width:260px;word-break:break-word;text-align:right}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">🛠️</div>
+  <h1>Field Engineer Attendance</h1>
+  <span class="badge">Location Based</span>
+  <div class="topbar-right">
+    <a class="btn-back" href="/employee">← Back</a>
+  </div>
+</div>
+
+<div class="content fade-in">
+
+  <div class="card">
+    <div class="title" id="fe-title">Detect Your Location</div>
+    <div class="sub" id="fe-sub">Fetch on current location of GPS — Save on the name of place and coordinates</div>
+  </div>
+
+  <div class="details" id="fe-details">
+    <div class="row">
+      <div class="i">🏙️</div>
+      <div class="info">
+        <div class="lbl">Place / Area</div>
+        <div class="val" id="fe-place">—</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="i">🗺️</div>
+      <div class="info">
+        <div class="lbl">Full Address</div>
+        <div class="val" id="fe-address">—</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="i">🔵</div>
+      <div class="info">
+        <div class="lbl">Coordinates</div>
+        <div class="val" id="fe-coords">—</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="i">🕐</div>
+      <div class="info">
+        <div class="lbl">Time</div>
+        <div class="val" id="fe-time">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!--div class="type-section" id="fe-type-section">
+   
+    <div class="type-grid" >
+      <button class="type-btn active" data-type="Field Engineering" onclick="selectType(this)">
+        <span class="t-icon">🛠️</span> Field Engineering
+      </button>
+     
+    </div>
+  </div>-->
+
+<div class="type-section" id="fe-type-section">
+
+    <div class="type-grid">
+        <button class="type-btn active"
+                data-type="Field Engineering"
+                onclick="selectType(this)">
+            <span class="t-icon">🛠️</span>
+            Field Engineer
+        </button>
+    </div>
+
+</div>
+
+<style>
+/* Parent div ko center karo */
+.type-grid{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Button styling */
+.type-btn{
+    width: 300px;
+    height: 90px;
+    border: 2px solid orange;
+    border-radius: 15px;
+    background: #1b140d;
+    color: orange;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.t-icon{
+    font-size: 24px;
+}
+</style>
+
+
+
+
+  <button class="btn btn-detect" id="fe-btn-detect" onclick="detectLocation()">
+    📍 &nbsp; Location Detect
+  </button>
+
+  <button class="btn btn-mark" id="fe-btn-mark" onclick="markAttendance()">
+    ✅ &nbsp; Mark On Attendance 
+  </button>
+
+  <div class="result" id="fe-result">
+    <div class="r-title" id="fe-result-title">—</div>
+    <div class="r-msg" id="fe-result-msg">—</div>
+  </div>
+
+  <div class="today-log">
+    <h3>Today Field Visits</h3>
+    <div class="log-row"><span class="lbl">Date</span><span class="val" id="fe-log-date">—</span></div>
+    <div class="log-row"><span class="lbl">Employee</span><span class="val" id="fe-log-emp">—</span></div>
+    <div class="log-row"><span class="lbl">Last Location</span><span class="val" id="fe-log-loc">—</span></div>
+    <div class="log-row"><span class="lbl">Last Visit Type</span><span class="val" id="fe-log-type">—</span></div>
+    </div>
+
+</div>
+
+<script>
+const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+let gpsData = null;
+let placeData = null;
+let selectedType = 'Field Engineering';
+
+function selectType(btn){
+  document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedType = btn.dataset.type;
+}
+
+// set log header
+const logDateEl = document.getElementById('fe-log-date');
+logDateEl.textContent = new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+
+document.getElementById('fe-log-emp').textContent = (user.name || '—') + ' (' + (user.emp_id || '—') + ')';
+
+async function loadTodayCount(){
+  try{
+    const res = await fetch('/api/location-attendance/today-count');
+    const data = await res.json();
+    if(data.ok) document.getElementById('fe-log-count').textContent = data.count + ' visit(s)';
+  }catch(e){}
+}
+
+function showResult(type, title, msg){
+  const el = document.getElementById('fe-result');
+  el.className = 'result show ' + (type === 'success' ? 'success' : 'fail');
+  document.getElementById('fe-result-title').textContent = title;
+  document.getElementById('fe-result-msg').textContent = msg;
+  el.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+async function detectLocation(){
+  if(!navigator.geolocation){
+    showResult('fail','Not GPS Support ','Your browser GPS not support');
+    return;
+  }
+
+  const btn = document.getElementById('fe-btn-detect');
+  const title = document.getElementById('fe-title');
+  const sub = document.getElementById('fe-sub');
+  const details = document.getElementById('fe-details');
+  const typeSection = document.getElementById('fe-type-section');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>&nbsp; Detecting...';
+  title.textContent = 'Location Detecting...';
+  sub.textContent = 'GPS signal fetching, wait some time';
+
+  navigator.geolocation.getCurrentPosition(async (pos)=>{
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
+    const acc = pos.coords.accuracy;
+    gpsData = { lat, lng, accuracy: acc };
+
+    try{
+      const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,{
+        headers:{'Accept-Language':'en'}
+      });
+      const geo = await r.json();
+
+      const addr = geo.address || {};
+      const place = addr.suburb || addr.neighbourhood || addr.village || addr.town || addr.city_district || addr.county || 'Unknown Area';
+      const city = addr.city || addr.town || addr.state_district || '';
+      const state = addr.state || '';
+      const country = addr.country || '';
+      const full = geo.display_name || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+
+      placeData = { place, city, state, country, full_address: full, lat, lng };
+
+      document.getElementById('fe-place').textContent = `${place}${city ? ', ' + city : ''}`;
+      document.getElementById('fe-address').textContent = full;
+      document.getElementById('fe-coords').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)} (±${Math.round(acc)}m)`;
+      document.getElementById('fe-time').textContent = new Date().toLocaleTimeString('en-IN');
+
+    }catch(e){
+      placeData = { place:'Unknown', city:'', state:'', country:'', full_address:`${lat.toFixed(5)}, ${lng.toFixed(5)}`, lat, lng };
+      document.getElementById('fe-place').textContent = 'Location detected (geocoding failed)';
+      document.getElementById('fe-address').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+      document.getElementById('fe-coords').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+      document.getElementById('fe-time').textContent = new Date().toLocaleTimeString('en-IN');
+    }
+
+    title.textContent = 'Location Find!';
+    sub.textContent = 'Everything is ready - mark your attendance';
+
+    details.classList.add('show');
+    typeSection.style.display = 'block';
+    document.getElementById('fe-btn-mark').classList.add('show');
+    btn.innerHTML = '🔄 &nbsp; Re-Detect';
+    btn.disabled = false;
+  }, (err)=>{
+    btn.disabled = false;
+    btn.innerHTML = '📍 &nbsp; Try again';
+    title.textContent = 'Location Error';
+    sub.textContent = 'GPS permission/time problem — Try again';
+  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+}
+
+async function markAttendance(){
+  if(!gpsData || !placeData){ alert('First location detect !'); return; }
+
+  const btn = document.getElementById('fe-btn-mark');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>&nbsp; Saving...';
+
+  // timeout helper (so UI stuck nahi rahe)
+  const timeoutMs = 15000;
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('Request timeout')), timeoutMs)
+  );
+
+  try{
+    const res = await Promise.race([
+      fetch('/api/field-engineer-attendance',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          lat: gpsData.lat,
+          lng: gpsData.lng,
+          accuracy: gpsData.accuracy,
+          place: placeData.place,
+          city: placeData.city,
+          state: placeData.state,
+          full_address: placeData.full_address,
+          visit_type: selectedType
+        })
+      }),
+      timeoutPromise
+    ]);
+
+    // Non-2xx handle
+    if(!res.ok){
+      let errText = '';
+      try{ errText = await res.text(); }catch(_){}
+      throw new Error(`Server error (${res.status}) ${errText}`.trim());
+    }
+
+    const data = await res.json();
+
+    if(data && data.ok){
+      showResult(
+        'success',
+        data.message || '✓ Marked',
+        `${selectedType} • ${placeData.place}${placeData.city ? ', ' + placeData.city : ''} • ${new Date().toLocaleTimeString('en-IN')}`
+      );
+
+      // update today log
+      const locEl = document.getElementById('fe-log-loc');
+      const typeEl = document.getElementById('fe-log-type');
+      if(locEl) locEl.textContent = `${placeData.place}${placeData.city ? ', ' + placeData.city : ''}`;
+      if(typeEl) typeEl.textContent = selectedType;
+      await loadTodayCount();
+
+      // ✅ Done on button itself
+      btn.disabled = true;
+      btn.innerHTML = '✅ &nbsp; Done';
+    }else{
+      showResult('fail', data?.error || 'Error', 'Try again');
+      btn.disabled = false;
+      btn.innerHTML = '✅ &nbsp;Mark your  Attendance ';
+    }
+  }catch(e){
+    showResult('fail','Server error', (e && e.message) ? e.message : 'Backend connect failed');
+    btn.disabled = false;
+    btn.innerHTML = '✅ &nbsp; Mark your Attendance ';
+  }
+}
+
+
+if(!user || !user.emp_id){
+  window.location.href = '/';
+}
+loadTodayCount();
+</script>
+</body>
+</html>
+

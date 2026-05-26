@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register — Smart Attendance</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--green:#1D9E75;--bg:#0D0F14;--card:#161920;--border:#252830;--text:#F0F2F5;--muted:#6B7280;--font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;--red:#D85A30}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;width:100%;max-width:440px}
+h2{font-family:var(--font-head);font-size:20px;font-weight:700;margin-bottom:6px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:24px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:500;margin-bottom:6px}
+.field input{width:100%;padding:11px 14px;background:#1C1F28;border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:var(--font-body);font-size:14px;outline:none;transition:.2s}
+.field input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(29,158,117,.1)}
+.btn{width:100%;padding:13px;border:none;border-radius:10px;background:var(--green);color:#fff;font-family:var(--font-head);font-size:15px;font-weight:700;cursor:pointer;margin-top:8px}
+.msg{margin-top:14px;padding:10px 14px;border-radius:8px;font-size:13px;display:none}
+.msg.ok{background:rgba(29,158,117,.1);border:1px solid rgba(29,158,117,.3);color:var(--green);display:block}
+.msg.err{background:rgba(216,90,48,.1);border:1px solid rgba(216,90,48,.3);color:var(--red);display:block}
+.back{display:block;text-align:center;color:var(--muted);font-size:13px;text-decoration:none;margin-top:16px}
+.back:hover{color:var(--text)}
+</style>
+</head>
+<body>
+<div class="card">
+  <h2>👤 Employee Register</h2>
+  <p class="sub">Create New Account in our company</p>
+  <div class="field"><label>Company Code (Slug)</label><input id="r-slug" placeholder="company-slug"></div>
+  <div class="field"><label>Your Name</label><input id="r-name" placeholder="Poora naam"></div>
+  <div class="field"><label>Employee ID</label><input id="r-empid" placeholder="EMP001"></div>
+  <div class="field"><label>Mobile</label><input id="r-mobile" type="tel" placeholder="10 digit" maxlength="10"></div>
+  <div class="field"><label>Password</label><input id="r-pass" type="password" placeholder="Min 6 characters"></div>
+  <button class="btn" onclick="doRegister()">Register Account</button>
+  <div class="msg" id="r-msg"></div>
+  <a href="/" class="back">← Come inLogin </a>
+</div>
+<script>
+async function doRegister() {
+  const slug   = document.getElementById('r-slug').value.trim();
+  const name   = document.getElementById('r-name').value.trim();
+  const emp_id = document.getElementById('r-empid').value.trim();
+  const mobile = document.getElementById('r-mobile').value.trim();
+  const pass   = document.getElementById('r-pass').value.trim();
+  const msg    = document.getElementById('r-msg');
+  msg.className = 'msg';
+
+  if (!slug || !name || !emp_id || !mobile || !pass) {
+    msg.className = 'msg err'; msg.textContent = 'Fill all field'; return;
+  }
+
+  // Verify slug
+  const orgRes = await fetch(`/api/org-info?slug=${encodeURIComponent(slug)}`);
+  const orgData = await orgRes.json();
+  if (!orgData.ok) { msg.className = 'msg err'; msg.textContent = 'Company code wrong'; return; }
+
+  const r = await fetch('/api/accounts/create-self', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({org_slug: slug, name, emp_id, mobile, password: pass})
+  });
+  const d = await r.json();
+  if (d.ok) {
+    msg.className = 'msg ok';
+    msg.textContent = '✓ Account Create! Come to login.';
+  } else {
+    msg.className = 'msg err'; msg.textContent = d.error;
+  }
+}
+</script>
+</body>
+</html>
