@@ -3,7 +3,14 @@ from datetime import datetime
 import hashlib
 from config import MONGO_URI
 
-client = MongoClient(MONGO_URI)
+# Fail fast/avoid long startup hang if Mongo is unreachable.
+client = MongoClient(
+    MONGO_URI,
+    serverSelectionTimeoutMS=3000,  # 3s
+    connectTimeoutMS=3000,
+    socketTimeoutMS=3000,
+)
+
 db = client["smart_attendance_saas"]
 
 # ── Global Collections ─────────────────────────────────
