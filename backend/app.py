@@ -199,26 +199,44 @@ def now_ist():
 #  PAGE ROUTES
 # ══════════════════════════════════════════════════
 
+
 @app.route("/")
 def index():
-    if "user_id" in session:
-        try:
-            user = users_col.find_one({"_id": ObjectId(session["user_id"])}, {"password": 0})
-            if user:
-                role = user.get("role")
-                if role == "super_admin":
-                    return redirect(url_for("super_admin_dashboard"))
-                elif role == "admin":
-                    return redirect(url_for("admin_dashboard"))
-                else:
-                    return redirect(url_for("employee_dashboard"))
-        except Exception:
-            session.clear()
+    return redirect(url_for("project_detail_page"))
+
+
+
+@app.route("/project-detail")
+def project_detail_page():
+    # Public landing preview (no auth redirect)
+    return render_template("project_detail.html")
+
+
+
+
+
+
+@app.route("/login")
+def login_page():
+    # Har role ke liye login.html
     return render_template("login.html")
+
+
+@app.route("/super-admin/create-from-login")
+def super_admin_create_from_login_page():
+    # public-ish page (no login) because user asked: create option on login page.
+    # It will still require /api/accounts/create-self to be super_admin via session.
+    # So typically you should create only after logging in as super_admin.
+    return render_template("super_admin_create_from_login.html")
+
+
+
 
 
 @app.route("/super-admin")
 def super_admin_dashboard():
+
+
     if "user_id" not in session:
         return redirect(url_for("index"))
     try:
@@ -229,6 +247,23 @@ def super_admin_dashboard():
     if not user or user.get("role") != "super_admin":
         return redirect(url_for("index"))
     return render_template("super_admin.html")
+
+
+@app.route("/super-admin/create-super-account")
+def super_admin_create_super_account_page():
+    if "user_id" not in session:
+        return redirect(url_for("index"))
+    try:
+        user = users_col.find_one({"_id": ObjectId(session["user_id"])}, {"password": 0})
+    except Exception:
+        session.clear()
+        return redirect(url_for("index"))
+
+    if not user or user.get("role") != "super_admin":
+        return redirect(url_for("index"))
+
+    return render_template("super_create_account.html")
+
 
 
 @app.route("/admin")
@@ -322,7 +357,29 @@ def location_attendance_today_count():
 
 @app.route("/register")
 def register_page():
+    """Registration page.
+
+    Business rule (requested):
+    - Create-account option sirf Super Admin ke liye allow hoga.
+    - Non-super-admin users ko block karna hai.
+
+    Note: Registration HTML (register.html) employee self-register UI ke liye bhi hai,
+    lekin this route ko super_admin-only banaya gaya hai.
+    """
+    if "user_id" not in session:
+        return redirect(url_for("login_page"))
+
+    try:
+        user = users_col.find_one({"_id": ObjectId(session["user_id"])}, {"password": 0})
+    except Exception:
+        session.clear()
+        return redirect(url_for("index"))
+
+    if not user or user.get("role") != "super_admin":
+        return redirect(url_for("index"))
+
     return render_template("register.html")
+
 
 
 @app.route("/forgot-password")
@@ -1558,6 +1615,7 @@ def accounts_list():
 
 @app.route("/api/accounts/create", methods=["POST"])
 def create_account():
+
     user, err = require_login(role="admin")
     if err:
         return err
@@ -1750,34 +1808,53 @@ if __name__ == "__main__":
 
 @app.route("/api/accounts/create-self", methods=["POST"])
 def create_account_self():
-    """Employees can register themselves using their company's slug."""
-    data     = request.json or {}
-    slug     = data.get("org_slug", "").strip()
-    name     = data.get("name", "").strip()
-    emp_id   = data.get("emp_id", "").strip()
-    mobile   = data.get("mobile", "").strip()
-    password = data.get("password", "").strip()
+    """Create-account option logic.
 
-    if not all([slug, name, emp_id, mobile, password]):
+    Requested behavior (your update):
+    - Created account par SUPER ADMIN ka account create hona chahiye.
+
+    So:
+    - This endpoint ab employee/org-based account create nahi karega.
+    - Instead it will create (or update if already exists) a global super_admin user
+      using provided {name, mobile, password}.
+
+    Note: UI is still sending org_slug/name/emp_id; we ignore org_slug & emp_id here.
+    """
+
+    user, err = require_login(role="super_admin")
+    if err:
+        return err
+
+    data = request.json or {}
+
+    # Accept UI fields, but only mobile + password matter for super_admin creation
+    name     = (data.get("name") or "").strip()
+    mobile   = (data.get("mobile") or "").strip()
+    password = (data.get("password") or "").strip()
+
+    # Keep accepting these for backward compatibility; ignore their values
+    # slug   = (data.get("org_slug") or "").strip()
+    # emp_id = (data.get("emp_id") or "").strip()
+
+    if not all([name, mobile, password]):
         return jsonify({"ok": False, "error": "All fields required"})
     if len(mobile) != 10 or not mobile.isdigit():
         return jsonify({"ok": False, "error": "Valid 10-digit mobile required"})
     if len(password) < 6:
         return jsonify({"ok": False, "error": "Password must be 6+ characters"})
 
-    org = organizations_col.find_one({"slug": slug, "active": True})
-    if not org:
-        return jsonify({"ok": False, "error": "Company not found"})
-
-    org_id = str(org["_id"])
-    if users_col.find_one({"mobile": mobile, "org_id": org_id}):
-        return jsonify({"ok": False, "error": "Mobile already registered in this company"})
-    if users_col.find_one({"emp_id": emp_id, "org_id": org_id}):
-        return jsonify({"ok": False, "error": f"Employee ID '{emp_id}' already in use"})
+    # If super_admin already exists with same mobile, don't create duplicate
+    existing = users_col.find_one({"mobile": mobile, "role": "super_admin"})
+    if existing:
+        return jsonify({"ok": False, "error": "Super admin already exists with this mobile"})
 
     users_col.insert_one({
-        "name": name, "emp_id": emp_id, "mobile": mobile,
-        "password": hash_password(password), "role": "employee",
-        "org_id": org_id, "created": datetime.now().strftime("%Y-%m-%d %H:%M")
+        "name": name,
+        "mobile": mobile,
+        "password": hash_password(password),
+        "role": "super_admin",
+        "created": datetime.now().strftime("%Y-%m-%d %H:%M"),
     })
-    return jsonify({"ok": True, "message": f"Account created! Login ."})
+
+    return jsonify({"ok": True, "message": "Super admin account created!"})
+

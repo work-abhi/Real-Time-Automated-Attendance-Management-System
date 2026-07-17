@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Attendance SaaS — Premium Landing</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+
+  <style>
+    /* Text should not occupy more than 30% of the page. The remaining 70% should consist of UI components such as dashboard mockups, feature cards, illustrations, statistics, graphs, icons, timelines, and call-to-action sections. */
+    :root{
+      --bg0:#070A12;
+      --bg1:#0B1020;
+      --text:#EAF0FF;
+      --muted:rgba(234,240,255,.72);
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.04);
+      --border:rgba(255,255,255,.14);
+      --blue:#4B8BFF;
+      --cyan:#44D7FF;
+      --green:#1D9E75;
+      --purple:#8B5CF6;
+      --orange:#EF9F27;
+      --red:#D85A30;
+
+      --radius-xl:28px;
+      --radius-lg:22px;
+      --radius-md:16px;
+
+      --shadow2:0 12px 40px rgba(0,0,0,.32);
+
+      --font-head:'Syne',sans-serif;
+      --font-body:'DM Sans',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 600px at 18% 10%, rgba(75,139,255,.22), transparent 55%),
+        radial-gradient(900px 500px at 82% 16%, rgba(139,92,246,.18), transparent 55%),
+        radial-gradient(900px 600px at 52% 82%, rgba(68,215,255,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      color:var(--text);
+      font-family:var(--font-body);
+      overflow-x:hidden;
+    }
+
+    .container{max-width:1180px;margin:0 auto;padding:0 20px;}
+    .section{padding:82px 0;}
+    @media(max-width:991px){.section{padding:62px 0;}}
+
+    .glass{
+      background: linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      position:relative;
+      overflow:hidden;
+      transform: translateZ(0);
+    }
+    .glass::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: radial-gradient(600px 220px at var(--mx,50%) var(--my,0%), rgba(75,139,255,.28), transparent 55%);
+      opacity:.8;
+      pointer-events:none;
+    }
+
+    .nav{
+      position: sticky; top: 0; z-index: 60;
+      background: rgba(8,12,22,.55);
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;}
+
+    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text)}
+    .logo{
+      width:44px;height:44px;border-radius:16px;
+      background: linear-gradient(135deg, rgba(75,139,255,.95), rgba(139,92,246,.85));
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow: 0 18px 50px rgba(75,139,255,.18);
+      display:flex;align-items:center;justify-content:center;
+      flex-shrink:0;
+    }
+    .brand-title{font-family:var(--font-head);font-weight:900;letter-spacing:-.6px;line-height:1;}
+    .brand-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+
+    .nav-links{display:flex;gap:10px;align-items:center;}
+    .nav-links a{
+      color:var(--muted);
+      text-decoration:none;
+      font-weight:900;
+      font-size:13px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid transparent;
+    }
+    .nav-links a:hover{color:var(--text);background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14)}
+
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:10px;
+      padding:12px 16px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.16);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      color:var(--text);
+      text-decoration:none;
+      font-weight:900;
+      font-family:var(--font-head);
+      transition:.22s ease;
+      white-space:nowrap;
+    }
+    .btn:hover{transform:translateY(-3px);border-color:rgba(120,160,255,.35);filter:saturate(1.05)}
+    .btn-primary{background:linear-gradient(135deg, rgba(75,139,255,.95), rgba(46,107,255,.85));border-color:rgba(120,160,255,.38)}
+
+    .kicker{
+      display:inline-flex;gap:10px;align-items:center;
+      border-radius:999px;padding:8px 12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      color:var(--muted);
+      font-weight:900;font-size:13px;
+    }
+    .dot-live{width:9px;height:9px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 6px rgba(68,215,255,.12)}
+
+    .hero-grid{display:grid;grid-template-columns:1.12fr .88fr;gap:22px;align-items:stretch;}
+    @media(max-width:991px){.hero-grid{grid-template-columns:1fr;}}
+
+    .h1{
+      font-family:var(--font-head);
+      font-weight:1000;
+      letter-spacing:-1.2px;
+      line-height:1.02;
+      font-size:clamp(36px,4.6vw,60px);
+      margin:14px 0 0;
+    }
+    .sub{
+      color:var(--muted);
+      font-size:14px;line-height:1.6;
+      margin-top:12px;
+      max-width:58ch;
+    }
+
+    .pill-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+    .pill{
+      padding:10px 12px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.05);
+      display:flex;align-items:center;gap:10px;
+      color:var(--muted);font-weight:800;font-size:13px;
+    }
+    .pill i{color:var(--blue)}
+
+    .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+
+    .mini-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+    @media(max-width:575px){.mini-row{grid-template-columns:1fr;}}
+
+    .mini{
+      padding:14px;border-radius:18px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.12);
+      position:relative;overflow:hidden;
+    }
+    .mini .label{font-size:12px;color:var(--muted);font-weight:900;letter-spacing:.3px;text-transform:uppercase}
+    .mini .value{font-family:var(--font-head);font-weight:1000;font-size:26px;margin-top:6px}
+    .mini .sub2{font-size:12px;color:var(--muted);margin-top:4px;font-weight:700}
+    .mini.cyan{border-color:rgba(68,215,255,.30)} .mini.cyan .value{color:var(--cyan)}
+    .mini.blue{border-color:rgba(75,139,255,.30)} .mini.blue .value{color:var(--blue)}
+    .mini.green{border-color:rgba(29,158,117,.30)} .mini.green .value{color:var(--green)}
+    .mini.purple{border-color:rgba(139,92,246,.30)} .mini.purple .value{color:var(--purple)}
+
+    .preview-card{padding:22px;border-radius:var(--radius-xl)}
+
+    .dash-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;position:relative;z-index:1}
+    .dash-title{font-family:var(--font-head);font-weight:900;letter-spacing:-.3px}
+    .badge{
+      padding:6px 10px;border-radius:999px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--muted);font-weight:900;font-size:12px;
+      display:inline-flex;align-items:center;gap:8px;
+    }
+
+    .analytics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:10px}
+    @media(max-width:420px){.analytics-grid{grid-template-columns:1fr}}
+
+    .trend{margin-top:12px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);padding:14px;position:relative;z-index:1}
+    .trend .chart-header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .small{color:var(--muted);font-weight:800;font-size:12px}
+    .bars{height:110px;display:flex;align-items:flex-end;gap:10px;padding:10px 6px}
+    .bar{flex:1;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);position:relative;overflow:hidden}
+    .bar::after{content:'';position:absolute;left:0;right:0;bottom:0;height:var(--h,60%);background:linear-gradient(180deg, rgba(68,215,255,.65), rgba(75,139,255,.85))}
+
+    .illustration{margin-top:14px;height:320px;border-radius:var(--radius-xl);background:
+      radial-gradient(240px 140px at 20% 20%, rgba(68,215,255,.20), transparent 60%),
+      radial-gradient(260px 160px at 80% 10%, rgba(139,92,246,.18), transparent 60%),
+      radial-gradient(240px 160px at 40% 85%, rgba(29,158,117,.14), transparent 65%),
+      rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.12);
+      position:relative;overflow:hidden;
+    }
+    .orbit{position:absolute;inset:-20px;background:conic-gradient(from 180deg, rgba(68,215,255,0), rgba(68,215,255,.35), rgba(139,92,246,.25), rgba(29,158,117,.18), rgba(68,215,255,0));filter:blur(6px);animation:spin 10s linear infinite;opacity:.55}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes upDown{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+    .float{
+      position:absolute;width:76px;height:76px;border-radius:26px;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 18px 60px rgba(0,0,0,.25);
+      backdrop-filter: blur(10px);
+      animation:upDown 3.6s ease-in-out infinite;
+    }
+    .float:nth-child(2){left:16px;top:18px;border-color:rgba(75,139,255,.26)}
+    .float:nth-child(3){right:22px;top:46px;border-color:rgba(139,92,246,.26);animation-delay:.6s}
+    .float:nth-child(4){left:30px;bottom:44px;border-color:rgba(29,158,117,.26);animation-delay:.3s}
+    .float:nth-child(5){right:36px;bottom:22px;border-color:rgba(68,215,255,.26);animation-delay:.9s}
+    .float i{font-size:24px;color:var(--text)}
+
+    @media(prefers-reduced-motion: reduce){.orbit,.float{animation:none !important;}}
+
+    /* Trusted */
+    .logo-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+    @media(max-width:991px){.logo-grid{grid-template-columns:repeat(2,1fr)}}
+    .logo-chip{border-radius:16px;padding:14px 12px;text-align:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);color:rgba(234,240,255,.85);font-weight:900;letter-spacing:.3px;font-family:var(--font-head)}
+
+    /* Feature cards */
+    .heading-row{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:26px}
+    .h2{font-family:var(--font-head);font-weight:1000;letter-spacing:-.8px;font-size:28px;margin-top:10px}
+
+    .card-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+    .span4{grid-column:span 4}
+    @media(max-width:991px){.span4{grid-column:span 6}}
+    @media(max-width:575px){.span4{grid-column:span 12}}
+
+    .feature{
+      padding:18px;border-radius:var(--radius-lg);
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.12);
+      position:relative;overflow:hidden;min-height:170px;
+    }
+    .feature::after{content:'';position:absolute;inset:-2px;background:radial-gradient(320px 160px at var(--mx,50%) var(--my,0%), rgba(75,139,255,.22), transparent 55%);opacity:.85;pointer-events:none}
+    .feature-top{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:1}
+    .f-icon{width:46px;height:46px;border-radius:18px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04)}
+    .tag{padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:var(--muted);font-weight:900;font-size:12px}
+    .feature h3{font-family:var(--font-head);font-weight:1000;font-size:16px;margin-top:14px;position:relative;z-index:1}
+    .feature p{font-size:13px;color:var(--muted);line-height:1.6;margin-top:8px;max-width:40ch;position:relative;z-index:1}
+
+    /* Timeline */
+    .timeline{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+    .tcard{grid-column:span 3;padding:18px;border-radius:var(--radius-lg);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);min-height:185px;position:relative;overflow:hidden}
+    @media(max-width:991px){.tcard{grid-column:span 6}}
+    @media(max-width:575px){.tcard{grid-column:span 12}}
+    .trow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .ticon{width:56px;height:56px;border-radius:22px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04)}
+    .tnum{font-family:var(--font-head);font-weight:1000;font-size:12px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase}
+    .tcard h3{font-family:var(--font-head);font-weight:1000;font-size:18px;margin-top:10px}
+    .tcard p{font-size:13px;color:var(--muted);line-height:1.6;margin-top:8px;max-width:42ch}
+
+    /* Product preview */
+    .preview-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+    .pcard{grid-column:span 6;padding:18px;border-radius:var(--radius-xl);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);}
+    @media(max-width:991px){.pcard{grid-column:span 12}}
+
+    .screen{border-radius:18px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));overflow:hidden;height:270px;position:relative}
+    .screen::before{content:'';position:absolute;inset:0;background:radial-gradient(320px 160px at 20% 0%, rgba(68,215,255,.18), transparent 60%),radial-gradient(360px 180px at 80% 10%, rgba(139,92,246,.14), transparent 60%);opacity:.9;pointer-events:none}
+    .screen-top{height:42px;display:flex;align-items:center;gap:10px;padding:0 12px;border-bottom:1px solid rgba(255,255,255,.10);position:relative;z-index:1}
+    .dotc{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.14)}
+    .stitle{font-family:var(--font-head);font-weight:900;font-size:12px;color:var(--muted);margin-left:6px}
+    .screen-body{position:relative;z-index:1;padding:12px;height:calc(100% - 42px)}
+    .screen-cols{display:grid;grid-template-columns:1.1fr .9fr;gap:10px;height:100%}
+    .mock-panel{border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);padding:12px}
+    .smallup{font-weight:900;font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+    .bignum{font-family:var(--font-head);font-weight:1000;font-size:28px;color:var(--green)}
+    .bars2{display:flex;gap:8px;align-items:flex-end;height:92px;margin-top:10px}
+    .sb{flex:1;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);position:relative;overflow:hidden}
+    .sb::after{content:'';position:absolute;left:0;right:0;bottom:0;height:var(--h,55%);background:linear-gradient(180deg, rgba(75,139,255,.75), rgba(68,215,255,.65));}
+    .chip-pill{border-radius:999px;padding:6px 10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:var(--muted);font-weight:900;font-size:11px}
+    .rowflex{display:flex;align-items:center;justify-content:space-between;gap:10px}
+
+    /* Tech stack badges */
+    .tech-row{display:flex;flex-wrap:wrap;gap:12px}
+    .tech-badge{padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;gap:10px;font-weight:900;color:rgba(234,240,255,.88)}
+    .tech-badge i{color:var(--cyan)}
+
+    /* Love us */
+    .love-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+    .love{grid-column:span 4;padding:18px;border-radius:var(--radius-lg);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);min-height:160px}
+    @media(max-width:991px){.love{grid-column:span 6}}
+    @media(max-width:575px){.love{grid-column:span 12}}
+    .love .t{width:52px;height:52px;border-radius:20px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center}
+    .love h3{font-family:var(--font-head);font-weight:1000;font-size:16px;margin-top:12px}
+    .love p{font-size:13px;color:var(--muted);line-height:1.6;margin-top:8px}
+
+    /* FAQ accordion */
+    .faq{max-width:900px;margin:0 auto}
+    details.faq-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:14px 16px;margin-bottom:12px}
+    details.faq-item summary{cursor:pointer;list-style:none;font-family:var(--font-head);font-weight:1000;letter-spacing:-.2px}
+    details.faq-item summary::-webkit-details-marker{display:none}
+    details.faq-item p{margin:10px 0 0;color:var(--muted);line-height:1.7;font-size:13.5px}
+
+    /* CTA */
+    .cta{padding:26px;border-radius:var(--radius-xl);border:1px solid rgba(255,255,255,.14);background:
+      radial-gradient(520px 260px at 20% 10%, rgba(75,139,255,.22), transparent 60%),
+      radial-gradient(520px 260px at 80% 0%, rgba(139,92,246,.18), transparent 60%),
+      rgba(255,255,255,.04);
+      box-shadow: var(--shadow2);
+    }
+    .cta-grid{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+    .cta-title{font-family:var(--font-head);font-weight:1000;letter-spacing:-.8px;font-size:clamp(24px,3.2vw,42px)}
+    .cta-right{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+
+    footer{padding:32px 0 48px;color:var(--muted)}
+    .foot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+
+    /* JS parallax/reveal */
+    @media(prefers-reduced-motion: reduce){.float,.orbit{animation:none !important}}
+  </style>
+</head>
+<body>
+
+  <!-- SECTION 0: NAV -->
+  <div class="nav">
+    <div class="container">
+      <div class="nav-inner">
+        <a class="brand" href="/project-detail">
+          <div class="logo"><i class="fa-solid fa-shield-halved"></i></div>
+          <div>
+            <div class="brand-title">Smart Attendance</div>
+            <div class="brand-sub">Real-time AI Attendance</div>
+          </div>
+        </a>
+
+        <div class="nav-links">
+          <a href="#features">Features</a>
+          <a href="#how">How it works</a>
+          <a href="#product">Product</a>
+          <a href="#stack">Tech</a>
+          <a href="#faq">FAQ</a>
+        </div>
+
+        <a class="btn btn-primary" href="#cta"><i class="fa-solid fa-rocket"></i> Get Started</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 1: Premium Hero -->
+  <section class="section" style="padding-top:46px;">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="glass" style="padding:28px;">
+          <div class="kicker"><span class="dot-live"></span> Real-Time AI Powered Attendance Management System</div>
+          <div class="h1">Smart Attendance SaaS</div>
+          <div class="sub">Real-time AI-powered attendance verification using Face, GPS radius, WiFi checks, QR and OTP workflows—backed by admin analytics and instant reports.</div>
+
+          <div class="pill-row">
+            <div class="pill"><i class="fa-solid fa-brain"></i> AI Face Recognition</div>
+            <div class="pill"><i class="fa-solid fa-location-dot"></i> GPS Attendance</div>
+            <div class="pill"><i class="fa-solid fa-wifi"></i> WiFi Verification</div>
+            <div class="pill"><i class="fa-solid fa-qrcode"></i> QR + OTP</div>
+          </div>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#cta"><i class="fa-solid fa-play"></i> Get Started</a>
+            <a class="btn" href="#product"><i class="fa-regular fa-circle-play"></i> Watch Demo</a>
+          </div>
+
+          <div class="mini-row">
+            <div class="mini green"><div class="label">Accuracy</div><div class="value">99.9%</div><div class="sub2">Verified checks</div></div>
+            <div class="mini cyan"><div class="label">Scale</div><div class="value">50K+</div><div class="sub2">Employees onboarded</div></div>
+            <div class="mini purple"><div class="label">Cloud</div><div class="value">24/7</div><div class="sub2">Audit-ready logs</div></div>
+          </div>
+        </div>
+
+        <div class="glass" style="padding:22px;">
+          <div class="dash-top">
+            <div class="dash-title">Beautiful Dashboard Preview</div>
+            <div class="badge"><i class="fa-solid fa-bolt"></i> Live • Auto-refresh</div>
+          </div>
+
+          <div class="analytics-grid">
+            <div class="mini blue" style="padding:14px;"><div class="label">Employee Statistics</div><div class="value">50K+</div><div class="sub2">Multi-company</div></div>
+            <div class="mini cyan" style="padding:14px;"><div class="label">Attendance Graph</div><div class="value">Live</div><div class="sub2">Trends + logs</div></div>
+          </div>
+
+          <div class="trend">
+            <div class="chart-header">
+              <div>
+                <div class="small" style="font-weight:1000">Attendance Graph</div>
+                <div class="small">Last 7 marks (mock UI)</div>
+              </div>
+              <div class="small"><i class="fa-solid fa-chart-line" style="color:var(--cyan)"></i> Real-time</div>
+            </div>
+            <div class="bars" aria-hidden="true">
+              <div class="bar" style="--h:78%"></div>
+              <div class="bar" style="--h:62%"></div>
+              <div class="bar" style="--h:84%"></div>
+              <div class="bar" style="--h:55%"></div>
+              <div class="bar" style="--h:70%"></div>
+              <div class="bar" style="--h:88%"></div>
+              <div class="bar" style="--h:64%"></div>
+            </div>
+          </div>
+
+          <div class="illustration" aria-hidden="true">
+            <div class="orbit"></div>
+            <div class="float"><i class="fa-solid fa-user-check"></i></div>
+            <div class="float"><i class="fa-solid fa-fingerprint"></i></div>
+            <div class="float"><i class="fa-solid fa-location-crosshairs"></i></div>
+            <div class="float"><i class="fa-solid fa-wifi"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: Trusted By -->
+  <section class="section" style="padding-top:22px;" id="trusted">
+    <div class="container">
+      <div class="glass" style="padding:22px;">
+        <div class="heading-row" style="margin-bottom:14px;">
+          <div>
+            <div class="kicker"><span class="dot-live" style="background:var(--purple);box-shadow:0 0 0 6px rgba(139,92,246,.14)"></span> Trusted By</div>
+            <div class="h2" style="font-size:26px;margin-top:10px;letter-spacing:-.8px;">Companies trust verified attendance</div>
+          </div>
+          <div class="sub" style="margin-top:0;max-width:40ch;">Designed for scale • Built for accuracy</div>
+        </div>
+
+        <div class="logo-grid">
+          <div class="logo-chip">Ardhnarishvar</div>
+          <div class="logo-chip">NexVolt</div>
+          <div class="logo-chip">CloudNest</div>
+          <div class="logo-chip">AtlasWorks</div>
+          <div class="logo-chip">NovaHR</div>
+        </div>
+
+        <div class="mini-row" style="margin-top:18px;grid-template-columns:repeat(4,1fr);gap:12px;">
+          <div class="mini orange"><div class="label">Companies</div><div class="value">500+</div><div class="sub2">Onboarded</div></div>
+          <div class="mini cyan"><div class="label">Employees</div><div class="value">50K+</div><div class="sub2">Active users</div></div>
+          <div class="mini green"><div class="label">Accuracy</div><div class="value">99.9%</div><div class="sub2">Verified checks</div></div>
+          <div class="mini purple"><div class="label">Cloud</div><div class="value">24/7</div><div class="sub2">Reliable service</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: Why Choose -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="heading-row">
+        <div>
+          <div class="kicker"><span class="dot-live"></span> Why Choose Smart Attendance</div>
+          <div class="h2">Six premium capabilities</div>
+        </div>
+        <div class="sub" style="margin-top:0;max-width:38ch;">AI, GPS, WiFi, QR and OTP—plus a cloud analytics layer.</div>
+      </div>
+
+      <div class="card-grid">
+        <div class="feature span4" style="--mx:50%;--my:0%">
+          <div class="feature-top"><div class="f-icon"><i class="fa-solid fa-face-smile"></i></div><div class="tag" style="border-color:rgba(75,139,255,.28);background:rgba(75,139,255,.10);color:#7DB3FF">AI</div></div>
+          <h3>AI Face Recognition</h3>
+          <p>Org-scoped face encoding so only registered employees are recognized.</p>
+        </div>
+
+        <div class="feature span4">
+          <div class="feature-top"><div class="f-icon"><i class="fa-solid fa-location-crosshairs"></i></div><div class="tag" style="border-color:rgba(68,215,255,.22);background:rgba(68,215,255,.10);color:#44D7FF">GPS</div></div>
+          <h3>GPS Attendance</h3>
+          <p>Radius checks against configured office coordinates for in/out reliability.</p>
+        </div>
+
+        <div class="feature span4">
+          <div class="feature-top"><div class="f-icon"><i class="fa-solid fa-qrcode"></i></div><div class="tag" style="border-color:rgba(239,159,39,.22);background:rgba(239,159,39,.10);color:#FBBF24">QR</div></div>
+          <h3>QR Attendance</h3>
+          <p>Fast kiosk-ready scanning workflow UI for consistent check-ins.</p>
+        </div>
+
+        <div class="feature span4">
+          <div class="feature-top"><div class="f-icon"><i class="fa-solid fa-fingerprint"></i></div><div class="tag" style="border-color:rgba(216,90,48,.22);background:rgba(216,90,48,.10);color:#FCA5A5">OTP</div></div>
+          <h3>OTP Attendance</h3>
+          <p>Secure alternate flow with time-limited OTP verification.</p>
+        </div>
+
+        <div class="feature span4">
+          <div class="feature-top"><div class="f-icon"><i class="fa-solid fa-wifi"></i></div><div class="tag" style="border-color:rgba(29,158,117,.22);background:rgba(29,158,117,.10);color:#3CE8B5">WiFi</div></div>
+          <h3>WiFi Verification</h3>
+          <p>Strict public IP matching to gate attendance from office network.</p>
+        </div>
+
+        <div class="feature span4">
+          <div class="feature-top"><div class="f-icon"><i class="fa-solid fa-cloud"></i></div><div class="tag" style="border-color:rgba(139,92,246,.22);background:rgba(139,92,246,.10);color:#A78BFA">Cloud</div></div>
+          <h3>Cloud Dashboard</h3>
+          <p>Admin analytics, date-wise logs, and instant CSV export.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: How It Works -->
+  <section class="section" id="how">
+    <div class="container">
+      <div class="heading-row">
+        <div>
+          <div class="kicker"><span class="dot-live" style="background:var(--orange);box-shadow:0 0 0 6px rgba(239,159,39,.14)"></span> How It Works</div>
+          <div class="h2">A verified workflow</div>
+        </div>
+        <div class="sub" style="margin-top:0;max-width:38ch;">From login to saved attendance.</div>
+      </div>
+
+      <div class="timeline">
+        <div class="tcard">
+          <div class="trow"><div class="ticon"><i class="fa-solid fa-right-to-bracket"></i></div><div class="tnum">Step 1</div></div>
+          <h3>Login</h3>
+          <p>Role-based access to start attendance securely.</p>
+        </div>
+        <div class="tcard">
+          <div class="trow"><div class="ticon"><i class="fa-solid fa-camera"></i></div><div class="tnum">Step 2</div></div>
+          <h3>Capture Face</h3>
+          <p>Camera capture with tolerance control.</p>
+        </div>
+        <div class="tcard">
+          <div class="trow"><div class="ticon"><i class="fa-solid fa-shield-halved"></i></div><div class="tnum">Step 3</div></div>
+          <h3>Verify</h3>
+          <p>GPS + WiFi checks (or OTP/QR modes) to confirm trust.</p>
+        </div>
+        <div class="tcard">
+          <div class="trow"><div class="ticon"><i class="fa-solid fa-database"></i></div><div class="tnum">Step 4</div></div>
+          <h3>Attendance Saved</h3>
+          <p>IN/OUT updates with method traceability and export.</p>
+        </div>
+      </div>
+
+      <!-- Face demo strip (extra UI) -->
+      <div class="glass" style="padding:18px;margin-top:18px;">
+        <div class="heading-row" style="margin-bottom:0;align-items:center">
+          <div>
+            <div class="kicker"><span class="dot-live" style="background:var(--cyan);box-shadow:0 0 0 6px rgba(68,215,255,.14)"></span> Face Recognition Demo</div>
+            <div class="h2" style="font-size:22px;margin-top:10px;">Live verification preview</div>
+          </div>
+          <div class="badge"><i class="fa-solid fa-microchip"></i> Mock pipeline</div>
+        </div>
+
+        <div class="card-grid" style="margin-top:14px">
+          <div class="feature span4" style="min-height:120px">
+            <div class="feature-top"><div class="f-icon"><i class="fa-solid fa-square-check"></i></div><div class="tag" style="border-color:rgba(75,139,255,.28);background:rgba(75,139,255,.10);color:#7DB3FF">Detected</div></div>
+            <h3>Face</h3>
+            <p>Frame analysis & detection.</p>
+          </div>
+          <div class="feature span4" style="min-height:120px">
+            <div class="feature-top"><div class="f-icon"><i class="fa-solid fa-user-lock"></i></div><div class="tag" style="border-color:rgba(29,158,117,.22);background:rgba(29,158,117,.10);color:#3CE8B5">Match</div></div>
+            <h3>Org Scoped</h3>
+            <p>Scoped encoding match.</p>
+          </div>
+          <div class="feature span4" style="min-height:120px">
+            <div class="feature-top"><div class="f-icon"><i class="fa-solid fa-badge-check"></i></div><div class="tag" style="border-color:rgba(139,92,246,.22);background:rgba(139,92,246,.10);color:#A78BFA">Result</div></div>
+            <h3>Verified</h3>
+            <p>IN/OUT ready.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: Product Preview -->
+  <section class="section" id="product">
+    <div class="container">
+      <div class="heading-row">
+        <div>
+          <div class="kicker"><span class="dot-live"></span> Product Preview</div>
+          <div class="h2">Admin & Employee dashboards</div>
+        </div>
+        <div class="sub" style="margin-top:0;max-width:40ch;">Beautiful mock screens that look like a real SaaS UI.</div>
+      </div>
+
+      <div class="preview-grid">
+        <div class="pcard">
+          <div class="screen">
+            <div class="screen-top">
+              <span class="dotc" style="background:rgba(29,158,117,.45)"></span>
+              <span class="dotc" style="background:rgba(75,139,255,.45)"></span>
+              <span class="dotc" style="background:rgba(139,92,246,.45)"></span>
+              <div class="stitle">Admin Dashboard • Reports • Export</div>
+            </div>
+            <div class="screen-body">
+              <div class="screen-cols">
+                <div class="mock-panel">
+                  <div class="smallup">Today</div>
+                  <div class="rowflex" style="margin-top:10px">
+                    <div>
+                      <div class="smallup" style="letter-spacing:.2px">Present</div>
+                      <div class="bignum">—</div>
+                    </div>
+                    <div class="chip-pill"><i class="fa-solid fa-file-export"></i> CSV</div>
+                  </div>
+                  <div class="bars2" aria-hidden="true">
+                    <div class="sb" style="--h:70%"></div>
+                    <div class="sb" style="--h:52%"></div>
+                    <div class="sb" style="--h:84%"></div>
+                  </div>
+                </div>
+                <div class="mock-panel">
+                  <div class="smallup">Methods</div>
+                  <div style="margin-top:10px;display:flex;flex-direction:column;gap:10px">
+                    <div class="rowflex"><div style="display:flex;align-items-center;gap:10px;">
+                      <div>
+                        <div class="smallup" style="letter-spacing:.2px">Matched</div>
+                        <div class="bignum">—</div>
+                      </div>
+                      <div class="chip-pill"><i class="fa-solid fa-user-check"></i> Verified</div>
+                    </div>
+                    <div class="bars2" aria-hidden="true">
+                      <div class="sb" style="--h:62%"></div>
+                      <div class="sb" style="--h:48%"></div>
+                      <div class="sb" style="--h:80%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: Tech Stack -->
+  <section class="section" id="stack">
+    <div class="container">
+      <div class="heading-row">
+        <div>
+          <div class="kicker"><span class="dot-live"></span> Tech Stack</div>
+          <div class="h2">Built for speed & reliability</div>
+        </div>
+        <div class="sub" style="margin-top:0;max-width:40ch;">Modular backend engines for face, field, and WiFi workflows.</div>
+      </div>
+
+      <div class="glass" style="padding:22px;">
+        <div class="tech-row">
+          <div class="tech-badge"><i class="fa-brands fa-python"></i> Python Engines</div>
+          <div class="tech-badge"><i class="fa-solid fa-database"></i> Database Layer</div>
+          <div class="tech-badge"><i class="fa-solid fa-gears"></i> Modular Attendance</div>
+          <div class="tech-badge"><i class="fa-solid fa-shield"></i> Verified Access</div>
+          <div class="tech-badge"><i class="fa-solid fa-wifi"></i> WiFi Validation</div>
+          <div class="tech-badge"><i class="fa-solid fa-location-dot"></i> GPS Radius Checks</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 7: FAQ -->
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="heading-row">
+        <div>
+          <div class="kicker"><span class="dot-live" style="background:var(--green);box-shadow:0 0 0 6px rgba(29,158,117,.14)"></span> FAQ</div>
+          <div class="h2">Common questions</div>
+        </div>
+        <div class="sub" style="margin-top:0;max-width:42ch;">Quick answers for setup, accuracy, and workflow.</div>
+      </div>
+
+      <div class="faq">
+        <details class="faq-item" open>
+          <summary>Is face recognition accurate?</summary>
+          <p>Yes—encodings are scoped to your organization. The system uses tolerance-based matching and logs each verification step.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>How does GPS attendance work?</summary>
+          <p>Office coordinates and a configurable radius are stored. Check-in succeeds only if the device location is within the allowed area.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>What about WiFi verification?</summary>
+          <p>It validates that the device is on the configured network (public IP match) before allowing attendance. This reduces spoofing risk.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>Do you support OTP/QR?</summary>
+          <p>Yes. OTP/QR provide backup workflows during camera failures or special scenarios—while keeping verification traceability.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 8: CTA -->
+  <section class="section" id="cta" style="padding-top:40px;">
+    <div class="container">
+      <div class="cta">
+        <div class="cta-grid">
+          <div class="cta-title">Start verified attendance in minutes</div>
+          <div class="cta-right">
+           
+            <a class="btn" href="/login"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+          </div>
+        </div>
+      </div>
+      <footer>
+        <div class="foot">
+          <div>© {{ year if year else 2026 }} Smart Attendance SaaS  ❤️Abhi</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <a href="/login" style="color:rgba(234,240,255,.72);text-decoration:none;font-weight:900;">Dashboard</a>
+            <a href="#faq" style="color:rgba(234,240,255,.72);text-decoration:none;font-weight:900;">FAQ</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </section>
+
+  <script>
+    // Subtle parallax highlight on glass cards
+    const mxmy = (el) => {
+      el.addEventListener('mousemove', (e) => {
+        const r = el.getBoundingClientRect();
+        const mx = ((e.clientX - r.left) / r.width) * 100;
+        const my = ((e.clientY - r.top) / r.height) * 100;
+        el.style.setProperty('--mx', mx + '%');
+        el.style.setProperty('--my', my + '%');
+      });
+    };
+    document.querySelectorAll('.glass').forEach(mxmy);
+  </script>
+</body>
+</html>

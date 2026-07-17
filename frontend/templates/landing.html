@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Attendance SaaS — Premium Landing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <style>
+    :root{
+      --bg0:#070A12;
+      --bg1:#0B1020;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.04);
+      --border: rgba(255,255,255,.14);
+      --border2: rgba(120,160,255,.22);
+      --text:#EAF0FF;
+      --muted: rgba(234,240,255,.72);
+      --blue:#4B8BFF;
+      --blue2:#2E6BFF;
+      --cyan:#44D7FF;
+      --green:#1D9E75;
+      --purple:#8B5CF6;
+      --orange:#EF9F27;
+      --red:#D85A30;
+
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+
+      --shadow: 0 24px 80px rgba(0,0,0,.35);
+      --shadow2: 0 12px 40px rgba(0,0,0,.32);
+    }
+
+    html,body{height:100%;}
+    body{
+      background: radial-gradient(1200px 600px at 20% 10%, rgba(75,139,255,.20), transparent 55%),
+                  radial-gradient(900px 500px at 80% 20%, rgba(139,92,246,.18), transparent 55%),
+                  radial-gradient(900px 600px at 50% 80%, rgba(68,215,255,.10), transparent 55%),
+                  linear-gradient(180deg, var(--bg0), var(--bg1));
+      color: var(--text);
+      font-family: 'DM Sans', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      overflow-x:hidden;
+    }
+
+    /* glassmorphism base */
+    .glass{
+      background: linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      position: relative;
+      overflow:hidden;
+      transform: translateZ(0);
+    }
+    .glass::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: radial-gradient(600px 220px at var(--mx,50%) var(--my,0%), rgba(75,139,255,.28), transparent 55%);
+      opacity:.8;
+      pointer-events:none;
+    }
+
+    .card-premium{
+      border-radius: var(--radius-xl);
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.045));
+    }
+
+    .hover-lift{
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+      border-color: rgba(255,255,255,.18);
+    }
+    .hover-lift:hover{
+      transform: translateY(-6px);
+      box-shadow: 0 30px 100px rgba(0,0,0,.45);
+      border-color: rgba(120,160,255,.35);
+    }
+
+    /* top navbar */
+    .nav-shell{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(8,12,22,.55);
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+    .nav-brand{
+      display:flex;align-items:center;gap:12px;
+      padding: 12px 0;
+    }
+    .brand-mark{
+      width:44px;height:44px;
+      border-radius:16px;
+      background: linear-gradient(135deg, rgba(75,139,255,.95), rgba(139,92,246,.85));
+      box-shadow: 0 18px 50px rgba(75,139,255,.18);
+      display:flex;align-items:center;justify-content:center;
+      border:1px solid rgba(255,255,255,.18);
+      flex-shrink:0;
+    }
+    .brand-mark i{font-size:18px;}
+    .brand-title{font-family:'Syne',sans-serif;font-weight:800;letter-spacing:-.4px;}
+    .brand-sub{font-size:12px;color:var(--muted);margin-top:-2px;}
+
+    .nav-link-glass{
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid transparent;
+      color: var(--muted);
+      transition: .2s ease;
+      background: transparent;
+      text-decoration:none;
+      font-weight:600;
+      font-size:13px;
+    }
+    .nav-link-glass:hover{
+      color: var(--text);
+      background: rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.14);
+      transform: translateY(-1px);
+    }
+
+    .btn-glass{
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      color: var(--text);
+      padding: 12px 16px;
+      font-weight:800;
+      font-family:'Syne',sans-serif;
+      letter-spacing:.2px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.25);
+      transition: .22s ease;
+      display:inline-flex;align-items:center;gap:10px;
+      text-decoration:none;
+    }
+    .btn-glass:hover{transform: translateY(-3px);border-color: rgba(120,160,255,.35);}
+
+    .btn-blue{
+      background: linear-gradient(135deg, rgba(75,139,255,.95), rgba(46,107,255,.85));
+      border-color: rgba(120,160,255,.38);
+    }
+    .btn-blue:hover{filter:saturate(1.05);}
+
+    .btn-ghost{
+      background: rgba(255,255,255,.04);
+    }
+
+    /* layout helpers */
+    .section-pad{padding: 70px 0;}
+    .kicker{display:inline-flex;gap:10px;align-items:center;border-radius:999px;padding:8px 12px;border:1px solid rgba(255,255,255,.14);background: rgba(255,255,255,.05);color: var(--muted);font-weight:700;font-size:13px;}
+    .dot-live{width:9px;height:9px;border-radius:50%;background: var(--cyan);box-shadow:0 0 0 6px rgba(68,215,255,.12);}
+
+    /* hero */
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+    @media (max-width: 991px){
+      .hero-grid{grid-template-columns: 1fr;}
+    }
+
+    .hero-card{padding: 26px; border-radius: var(--radius-xl);}
+
+    .hero-title{
+      font-family:'Syne',sans-serif;
+      font-weight:900;
+      letter-spacing:-1.2px;
+      line-height:1.02;
+      font-size: clamp(34px, 4vw, 54px);
+    }
+    .hero-sub{
+      color: var(--muted);
+      font-size: 15px;
+      line-height:1.7;
+      margin-top: 14px;
+      max-width: 52ch;
+    }
+
+    .mini-row{
+      display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;
+    }
+
+    .pill{
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      display:flex;align-items:center;gap:10px;
+      color: var(--muted);
+      font-weight:700;font-size:13px;
+    }
+    .pill i{color: var(--blue);}
+
+    /* floating cards on right */
+    .float-area{position: relative; min-height: 520px;}
+    @media (max-width: 991px){.float-area{min-height: 420px;}}
+
+    .float-card{
+      position:absolute;
+      width: 240px;
+      padding: 16px;
+      border-radius: 22px;
+      transform: translateY(0);
+      animation: floaty 5.2s ease-in-out infinite;
+    }
+    .float-card:nth-child(2){left: 0; top: 160px; animation-delay: .2s;}
+    .float-card:nth-child(3){right: 0; top: 120px; animation-delay: .6s;}
+    .float-card:nth-child(4){left: 20px; bottom: 20px; animation-delay: .9s;}
+    .float-card:nth-child(5){right: 20px; bottom: 40px; animation-delay: 1.2s;}
+
+    @keyframes floaty{0%,100%{transform: translateY(0)}50%{transform: translateY(-10px)}}
+
+    .mini-title{font-family:'Syne',sans-serif;font-weight:900;font-size:14px;margin-bottom:8px;display:flex;gap:10px;align-items:center;}
+    .mini-title i{width:30px;height:30px;border-radius:12px;display:flex;align-items:center;justify-content:center;background: rgba(75,139,255,.15);border:1px solid rgba(75,139,255,.25);color: var(--blue);}
+    .mini-kv{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;}
+    .mini-kv .num{font-family:'Syne',sans-serif;font-weight:900;font-size:26px;}
+    .mini-kv .tag{font-size:12px;color: var(--muted);font-weight:700;}
+
+    .trend-bar{height:10px;border-radius:999px;background: rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);overflow:hidden;}
+    .trend-bar > span{display:block;height:100%;width:62%;background: linear-gradient(90deg, rgba(75,139,255,.95), rgba(139,92,246,.85));}
+
+    /* feature cards */
+    .grid-cards{display:grid;gap:14px;grid-template-columns: repeat(12, 1fr);} 
+    .col-span-4{grid-column: span 4;}
+    .col-span-3{grid-column: span 3;}
+    @media (max-width: 991px){.col-span-4{grid-column: span 6;} .col-span-3{grid-column: span 6;}}
+    @media (max-width: 575px){.col-span-4{grid-column: span 12;} .col-span-3{grid-column: span 12;}}
+
+    .feature-card{padding: 18px;border-radius: var(--radius-lg);min-height: 132px;}
+    .feature-top{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .f-icon{
+      width:42px;height:42px;border-radius:18px;
+      display:flex;align-items:center;justify-content:center;
+      background: rgba(75,139,255,.16);
+      border: 1px solid rgba(75,139,255,.28);
+      color: var(--blue);
+      box-shadow: 0 18px 40px rgba(75,139,255,.08);
+    }
+    .f-title{font-family:'Syne',sans-serif;font-weight:900;font-size:16px;margin-top:12px;}
+    .f-desc{color: var(--muted);font-size:13px;line-height:1.6;margin-top:8px;}
+
+    /* About */
+    .about-grid{display:grid;gap:14px;grid-template-columns: 1.2fr .8fr;align-items:start;}
+    @media (max-width: 991px){.about-grid{grid-template-columns:1fr;}}
+
+    .stat-small{padding:16px;border-radius: 18px;}
+    .stat-small .s-label{color: var(--muted);font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
+    .stat-small .s-val{font-family:'Syne',sans-serif;font-weight:900;font-size:26px;margin-top:8px;}
+
+    /* How it works connected cards */
+    .steps-wrap{display:grid;gap:14px;grid-template-columns: repeat(12, 1fr);}
+    .step-card{grid-column: span 2; padding:18px;border-radius: 24px; min-height: 168px;}
+    @media (max-width: 991px){.step-card{grid-column: span 6;}}
+    @media (max-width: 575px){.step-card{grid-column: span 12;}}
+
+    .step-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+    .step-num{width:44px;height:44px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:900;background: rgba(75,139,255,.16);border:1px solid rgba(75,139,255,.28);}
+    .step-title{font-family:'Syne',sans-serif;font-weight:900;font-size:16px;margin-top:10px;}
+    .step-mid{color: var(--muted);font-size:13px;line-height:1.6;margin-top:8px;}
+
+    /* Code-style API cards */
+    .code-card{padding: 0; overflow:hidden; border-radius: var(--radius-lg);}
+    .code-head{padding: 14px 16px; border-bottom:1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04); display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .code-head .route{font-family:'Syne',sans-serif;font-weight:900;font-size:14px;}
+    pre{
+      margin:0;
+      padding: 14px 16px 16px;
+      color: rgba(234,240,255,.9);
+      font-size: 12px;
+      line-height: 1.6;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+      background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.22));
+    }
+
+    /* FAQ accordion card */
+    .faq-wrap{display:grid;gap:14px;}
+    .accordion-item{border-radius: 20px; border:1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.05); overflow:hidden; backdrop-filter: blur(14px);} 
+    .accordion-button{
+      background: transparent;
+      color: var(--text);
+      font-weight:900;
+      font-family:'Syne',sans-serif;
+      letter-spacing:.1px;
+    }
+    .accordion-button:focus{box-shadow:none;}
+    .accordion-body{color: var(--muted); font-size: 13.5px; line-height: 1.7;}
+
+    /* scroll animations */
+    .reveal{opacity:0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease;}
+    .reveal.in{opacity:1; transform: translateY(0);}
+
+    /* footer */
+    .footer-card{padding: 22px; border-radius: var(--radius-xl);}
+
+    /* bootstrap overrides */
+    .container-wide{max-width: 1180px;}
+
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <div class="nav-shell">
+    <div class="container container-wide">
+      <div class="d-flex align-items-center justify-content-between py-1" style="gap:14px;">
+        <div class="nav-brand">
+          <div class="brand-mark"><i class="fa-solid fa-shield-halved"></i></div>
+          <div>
+            <div class="brand-title">Smart Attendance</div>
+            <div class="brand-sub">Enterprise AI • Multi-Company SaaS</div>
+          </div>
+        </div>
+
+        <div class="d-none d-lg-flex" style="gap:10px;align-items:center;">
+          <a class="nav-link-glass" href="#features">Features</a>
+          <a class="nav-link-glass" href="#stack">Technology</a>
+          <a class="nav-link-glass" href="#how">How it works</a>
+          <a class="nav-link-glass" href="#security">Security</a>
+          <a class="nav-link-glass" href="#faq">FAQ</a>
+        </div>
+
+        <div class="d-flex" style="gap:10px;align-items:center;">
+          <a class="btn-glass btn-ghost" href="#contact"><i class="fa-regular fa-paper-plane"></i> Contact</a>
+          <a class="btn-glass btn-blue" href="#hero"><i class="fa-solid fa-rocket"></i> Get Demo</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="section-pad" id="hero">
+    <div class="container container-wide">
+      <div class="hero-grid">
+        <div class="glass hero-card card-premium reveal" data-reveal>
+          <div class="kicker mb-3"><span class="dot-live"></span> AI-assisted attendance, verified by GPS + WiFi</div>
+          <h1 class="hero-title">Premium Smart Attendance SaaS for Face • GPS • WiFi • QR • OTP</h1>
+          <div class="hero-sub">
+            Glass-secure workflows that reduce time theft, improve attendance accuracy, and make reports instantly exportable—without any plain sections.
+          </div>
+
+          <div class="mini-row">
+            <div class="pill"><i class="fa-solid fa-brain"></i> AI Face Recognition</div>
+            <div class="pill"><i class="fa-solid fa-location-dot"></i> Org-aware GPS Radius</div>
+            <div class="pill"><i class="fa-solid fa-network-wired"></i> Office WiFi Verification</div>
+            <div class="pill"><i class="fa-solid fa-shield-virus"></i> Role-based Security</div>
+          </div>
+
+          <div class="d-flex flex-wrap gap-3 mt-4">
+            <a class="btn-glass btn-blue" href="#how"><i class="fa-solid fa-play"></i> Watch workflow</a>
+            <a class="btn-glass btn-ghost" href="#features"><i class="fa-solid fa-layer-group"></i> Explore features</a>
+          </div>
+
+          <div class="row g-3 mt-4">
+            <div class="col-6 col-md-4">
+              <div class="glass hover-lift p-3" style="border-radius: 18px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                  <div style="color:var(--muted);font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Live Coverage</div>
+                  <div style="color:var(--cyan);font-weight:900;">99.9%</div>
+                </div>
+                <div class="mt-2" style="height:10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);overflow:hidden;">
+                  <span style="display:block;height:100%;width:78%;background:linear-gradient(90deg, rgba(68,215,255,.9), rgba(75,139,255,.95));"></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="glass hover-lift p-3" style="border-radius: 18px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                  <div style="color:var(--muted);font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Attendance Accuracy</div>
+                  <div style="color:var(--green);font-weight:900;">+42%</div>
+                </div>
+                <div class="mt-2" style="height:10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);overflow:hidden;">
+                  <span style="display:block;height:100%;width:64%;background:linear-gradient(90deg, rgba(29,158,117,.95), rgba(75,139,255,.9));"></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="glass hover-lift p-3" style="border-radius: 18px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                  <div style="color:var(--muted);font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Secure Authentication</div>
+                  <div style="color:var(--purple);font-weight:900;">JWT • TLS</div>
+                </div>
+                <div class="mt-2" style="display:flex;gap:10px;flex-wrap:wrap;">
+                  <span class="badge rounded-pill" style="background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#A78BFA;">JWT</span>
+                  <span class="badge rounded-pill" style="background:rgba(75,139,255,.15);border:1px solid rgba(75,139,255,.3);color:#7DB3FF;">HTTPS</span>
+                  <span class="badge rounded-pill" style="background:rgba(29,158,117,.12);border:1px solid rgba(29,158,117,.28);color:#3CE8B5;">RBAC</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="float-area reveal" data-reveal>
+          <div class="glass float-card hover-lift" style="left:0; top:44px; border-radius: 22px; width: 240px;" >
+            <div class="mini-title"><i class="fa-solid fa-user-check"></i> Employee Live</div>
+            <div class="mini-kv"><div><div class="num"><span class="counter" data-target="842">0</span></div><div class="tag">Managed employees</div></div>
+              <div style="text-align:right;">
+                <div style="color:var(--green);font-weight:900;font-family:'Syne',sans-serif;">+18%</div>
+                <div class="tag">this month</div>
+              </div>
+            </div>
+            <div class="mt-3 trend-bar"><span></span></div>
+          </div>
+
+          <div class="glass float-card hover-lift" style="left:0; top:180px; border-radius: 22px;">
+            <div class="mini-title"><i class="fa-solid fa-fingerprint"></i> Attendance Accuracy</div>
+            <div class="mini-kv"><div><div class="num"><span class="counter" data-target="97">0</span>%</div><div class="tag">match quality</div></div>
+              <div style="text-align:right;">
+                <div style="color:var(--blue);font-weight:900;font-family:'Syne',sans-serif;">0.5s</div>
+                <div class="tag">avg verify</div>
+              </div>
+            </div>
+            <div class="mt-3 trend-bar"><span style="width:71%"></span></div>
+          </div>
+
+          <div class="glass float-card hover-lift" style="right:0; top:120px; border-radius: 22px;">
+            <div class="mini-title"><i class="fa-solid fa-lock"></i> Secure Authentication</div>
+            <div class="mini-kv"><div><div class="num"><span class="counter" data-target="24">0</span>/7</div><div class="tag">audit ready</div></div>
+              <div style="text-align:right;">
+                <div style="color:var(--purple);font-weight:900;font-family:'Syne',sans-serif;">TLS</div>
+                <div class="tag">encrypted</div>
+              </div>
+            </div>
+            <div class="mt-3 trend-bar"><span style="width:58%"></span></div>
+          </div>
+
+          <div class="glass float-card hover-lift" style="left:18px; bottom:14px; border-radius: 22px;">
+            <div class="mini-title"><i class="fa-solid fa-calendar-check"></i> Attendance Status</div>
+            <div class="mini-kv"><div><div class="num"><span class="counter" data-target="186">0</span></div><div class="tag">today marked</div></div>
+              <div style="text-align:right;">
+                <div style="color:var(--orange);font-weight:900;font-family:'Syne',sans-serif;">–3</div>
+                <div class="tag">late alerts</div>
+              </div>
+            </div>
+            <div class="mt-3 trend-bar"><span style="width:66%"></span></div>
+          </div>
+
+          <div class="glass float-card hover-lift" style="right:18px; bottom:36px; border-radius: 22px;">
+            <div class="mini-title"><i class="fa-solid fa-chart-line"></i> Real-time Analytics</div>
+            <div class="mini-kv"><div><div class="num"><span class="counter" data-target="12">0</span></div><div class="tag">insight panels</div></div>
+              <div style="text-align:right;">
+                <div style="color:var(--cyan);font-weight:900;font-family:'Syne',sans-serif;">AI</div>
+                <div class="tag">summaries</div>
+              </div>
+            </div>
+            <div class="mt-3 trend-bar"><span style="width:74%"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section-pad" id="about">
+    <div class="container container-wide">
+      <div class="about-grid">
+        <div class="glass card-premium hover-lift reveal" data-reveal style="padding: 26px;">
+          <div class="kicker mb-3"><span class="dot-live" style="background:var(--blue);box-shadow:0 0 0 6px rgba(75,139,255,.14)"></span> About Project</div>
+          <div class="d-flex align-items-start justify-content-between gap-3">
+            <div>
+              <div style="font-family:'Syne',sans-serif;font-weight:900;font-size:20px;">Built for enterprises that need accuracy + auditability</div>
+              <div style="color:var(--muted);font-size:13.5px;line-height:1.75;margin-top:10px;max-width:62ch;">
+                Every attendance is verified with identity and context (face/GPS/WiFi/QR/OTP) and then stored with method-level traceability.
+              </div>
+            </div>
+            <div class="f-icon" style="background:rgba(139,92,246,.16);border-color:rgba(139,92,246,.28);color:var(--purple);width:52px;height:52px;">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+          </div>
+
+          <div class="row g-3 mt-3">
+            <div class="col-12 col-md-6">
+              <div class="glass p-3 hover-lift" style="border-radius: 18px;">
+                <div style="display:flex;gap:10px;align-items:center;">
+                  <i class="fa-solid fa-database" style="color:var(--cyan);width:34px;height:34px;border-radius:14px;background:rgba(68,215,255,.14);border:1px solid rgba(68,215,255,.26);display:flex;align-items:center;justify-content:center;"></i>
+                  <div>
+                    <div style="font-weight:900;font-family:'Syne',sans-serif;">Audit-first storage</div>
+                    <div style="color:var(--muted);font-size:12.5px;margin-top:3px;">Method in/out fields + secure logs.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="glass p-3 hover-lift" style="border-radius: 18px;">
+                <div style="display:flex;gap:10px;align-items:center;">
+                  <i class="fa-solid fa-file-export" style="color:var(--blue);width:34px;height:34px;border-radius:14px;background:rgba(75,139,255,.14);border:1px solid rgba(75,139,255,.26);display:flex;align-items:center;justify-content:center;"></i>
+                  <div>
+                    <div style="font-weight:900;font-family:'Syne',sans-serif;">Instant reports</div>
+                    <div style="color:var(--muted);font-size:12.5px;margin-top:3px;">Analytics + Excel export ready.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-grid gap-14" style="align-content:start;">
+          <div class="glass stat-small hover-lift reveal" data-reveal><div class="s-label">Employees Managed</div><div class="s-val"><span class="counter" data-target="1250">0</span>+</div><div style="color:var(--muted);font-size:12.5px;margin-top:8px;">Multi-company org scoping</div></div>
+          <div class="glass stat-small hover-lift reveal" data-reveal><div class="s-label">Attendance Accuracy</div><div class="s-val"><span class="counter" data-target="98">0</span>%</div><div style="color:var(--muted);font-size:12.5px;margin-top:8px;">Identity + context verification</div></div>
+          <div class="glass stat-small hover-lift reveal" data-reveal><div class="s-label">Secure Authentication</div><div class="s-val"><span class="counter" data-target="99">0</span>%</div><div style="color:var(--muted);font-size:12.5px;margin-top:8px;">JWT + RBAC + encrypted passwords</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section-pad" id="features">
+    <div class="container container-wide">
+      <div class="d-flex align-items-center justify-content-between gap-3 mb-4 reveal" data-reveal>
+        <div>
+          <div class="kicker mb-2"><span class="dot-live" style="background:var(--purple);box-shadow:0 0 0 6px rgba(139,92,246,.14)"></span> Features</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:900;font-size:24px;">Every capability wrapped in premium glass cards</div>
+        </div>
+        <div class="glass p-3" style="border-radius: 18px; border-color: rgba(120,160,255,.25);">
+          <div style="color:var(--muted);font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Designed for enterprise teams</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:900;font-size:18px;margin-top:6px;">Fast setup • Secure by default</div>
+        </div>
+      </div>
+
+      <div class="grid-cards">
+        <!-- each feature card -->
+        <div class="col-span-3 glass feature-card hover-lift reveal" data-reveal>
+          <div class="feature-top"><div class="f-icon"><i class="fa-solid fa-face-smile"></i></div><span class="badge rounded-pill" style="background:rgba(75,139,255,.12);border:1px solid rgba(75,139,255,.25);color:#7DB3FF;font-weight:800;">AI</span></div>
+          <div class="f-title">Face Recognition</div>
+          <div class="f-desc">Encoding-based verification with org-scoped matching.</div>
+        </div>
+
+        <div class="col-span-3 glass feature-card hover-lift reveal" data-reveal>
+          <div class="feature-top"><div class="f-icon" style="background:rgba(68,215,255,.14);border-color:rgba(68,215,255,.26);color:var(--cyan)"><i class="fa-solid fa-location-crosshairs"></i></div><span class="badge rounded-pill" style="background:rgba(68,215,255,.10);border:1px solid rgba(68,215,255,.24);color:#44D7FF;font-weight:800;">GPS</span></div>
+          <div class="f-title">GPS Attendance</div>
+          <div class="f-desc">Radius checks against configured office coordinates.</div>
+        </div>
+
+        <div class="col-span-3 glass feature-card hover-lift reveal" data-reveal>
+          <div class="feature-top"><div class="f-icon" style="background:rgba(29,158,117,.12);border-color:rgba(29,158,117,.25);color:var(--green)"><i class="fa-solid fa-wifi"></i></div><span class="badge rounded-pill" style="background:rgba(29,158,117,.10);border:1px solid rgba(29,158,117,.24);color:#3CE8B5;font-weight:800;">WiFi</span></div>
+          <div class="f-title">WiFi Verification</div>
+          <div class="f-desc">Strict office public IP validation for network attestation.</div>
+        </div>
+
+        <div class="col-span-3 glass feature-card hover-lift reveal" data-reveal>
+          <div class="feature-top"><div class="f-icon" style="background:rgba(239,159,39,.12);border-color:rgba(239,159,39,.24);color:var(--orange)"><i class="fa-solid fa-qrcode"></i></div><span class="badge rounded-pill" style="background:rgba(239,159,39,.10);border:1px solid rgba(239,159,39,.24);color:#FBBF24;font-weight:800;">QR</span></div>
+          <div class="f-title">QR Attendance</div>
+          <div class="f-desc">Kiosk-friendly scanning entry with tamper-proof workflow.</div>
+        </div>
+
+        <div class="col-span-3 glass feature-card hover-lift reveal" data-reveal>
+          <div class="feature-top"><div class="f-icon" style="background:rgba(216,90,48,.12);border-color:rgba(216,90,48,.24);color:var(--red)"><i class="fa-solid fa-fingerprint"></i></div><span class="badge rounded-pill" style="background:rgba(216,90,48,.10);border:1px solid rgba(216,90,48,.24);color:#FCA5A5;font-weight:800;">OTP</span></div>
+          <div class="f-title">OTP Verification</div>
+          <div class="f-desc">Time-limited OTP flow for secure alternate attendance mode.</div>
+        </div>
+
+        <div class="col-span-3 glass feature-card hover-lift reveal" data-reveal>
+          <div class="feature-top"><div class="f-icon"><i class="fa-solid fa-users"></i></div><span class="badge rounded-pill" style="background:rgba(75,139,255,.12);border:1px solid rgba(75,139,255,.25);color:#7DB3FF;font-weight:800;">Core</span></div>
+          <div class="f-title">Employee Management</div>
+          <div class="f-desc">Face registration + account lifecycle per company.</div>
+        </div>
+
+        <div class="col-span-3 glass feature-card hover-lift reveal" data-reveal>
+          <div class="feature-top"><div class="f-icon" style="background:rgba(139,92,246,.14);border-color:rgba(139,92,246,.26);color:var(--purple)"><i class="fa-solid fa-diagram-project"></i></div><span class="badge rounded-pill" style="background:rgba(139,92,246,.10);border:1px solid rgba(139,92,246,.26);color:#A78BFA;font-weight:800;">Org</span></div>
+          <div class="f-title">Department Management</div>
+          <div class="f-desc">Team organization for reporting and admin controls.</div>
+        </div>
+
+        <div class="col-span-3 glass feature-card hover-lift reveal" data-reveal>
+          <div class="feature-top"><div class="f-icon" style="background:rgba(29,158,117,.12);border-color:rgba(29,158,117,.25);color:var(--green)"><i class="fa-solid fa-hand-holding-heart"></i></div><span class="badge rounded-pill" style="background:rgba(29,158,117,.10);border:1px solid rgba(29,158,117,.24);color:#3CE8B5;font-weight:800;">HR</span></div>
+          <div class="f-title">Leave Management</div>
+          <div class="f-desc">Leave requests integrated with attendance outcomes.</div>
+        </div>
+
+        <div class="col-span-3 glass feature-card hover-lift reveal" data-reveal>
+          <div class="feature-top"><div class="f-icon" style="background:rgba(68,215,255,.14);border-color:rgba(68,215,255,.26);color:var(--cyan)"><i class="fa-solid fa-file-lines"></i></div><span class="badge rounded-pill" style="background:rgba(68,215,255,.10);border:1px solid rgba(68,215,255,.22);color:#44D7FF;font-weight:800;">Reports</span></div>
+          <div class="f-title">Attendance Reports</div>
+          <div class="f-desc">Date-wise and type-wise attendance views.</div>
+        </div>
+
+        <div class="col-span-3 glass feature-card hover-lift reveal" data-reveal>
+          <div class="feature-top"><div class="f-icon" style="background:rgba(75,139,255,.14);border-color:rgba(75,139,255,.28);color:var(--blue)"><i class="fa-solid fa-chart-pie"></i></div><span class="badge rounded-pill" style="background:rgba(75,139,255,.10);border:1px solid rgba(75,139,255,.26);color:#7DB3FF;font-weight:800;">AI</span></div>
+          <div class="f-title">Analytics Dashboard</div>
+          <div class="f-desc">Premium dashboards for trends, gaps, and insights.</div>
+        </div>
+
+        <div class="col-span-3 glass feature-card hover-lift reveal" data-reveal>
+          <div class="feature-top"><div class="f-icon" style="background:rgba(239,159,39,.12);border-color:rgba(239,159,39,.25);color:var(--orange)"><i class="fa-solid fa-file-export"></i></div><span class="badge rounded-pill" style="background:rgba(239,159,39,.10);border:1px solid rgba(239,159,39,.22);color:#FBBF24;font-weight:800;">Excel</span></div>
+          <div class="f-title">Excel Export</div>
+          <div class="f-desc">Export attendance records for finance & HR workflows.</div>
+        </div>
+
+        <div class="col-span-3 glass feature-card hover-lift reveal" data-reveal>
+          <div class="feature-top"><div class="f-icon" style="background:rgba(139,92,246,.14);border-color:rgba(139,92,246,.26);color:var(--purple)"><i class="fa-solid fa-user-shield"></i></div><span class="badge rounded-pill" style="background:rgba(139,92,246,.10);border:1px solid rgba(139,92,246,.24);color:#A78BFA;font-weight:800;">RBAC</span></div>
+          <div class="f-title">Role Based Access</div>
+          <div class="f-desc">Super Admin, Admin, Employee permissions.</div>
+        </div>
+
+        <div class="col-span-3 glass feature-card hover-lift reveal" data-reveal>
+          <div class="feature-top"><div class="f-icon"><i class="fa-solid fa-fingerprint"></i></div><span class="badge rounded-pill" style="background:rgba(75,139,255,.12);border:1px solid rgba(75,139,255,.25);color:#7DB3FF;font-weight:800;">JWT</span></div>
+          <div class="f-title">JWT Authentication</div>
+          <div class="f-desc">Tokenized sessions for secure API access.</div>
+        </div>
+
+        <div class="col-span-3 glass feature-card hover-lift reveal" data-reveal>
+          <div class="feature-top"><div class="f-icon" style="background:rgba(68,215,255,.14);border-color:rgba(68,215,255,.26);color:var(--cyan)"><i class="fa-solid fa-cloud"></i></div><span class="badge rounded-pill" style="background:rgba(68,215,255,.10);border:1px solid rgba(68,215,255,.22);color:#44D7FF;font-weight:800;">Cloud</span></div>
+          <div class="f-title">Cloud Ready</div>
+          <div class="f-desc">Deployable architecture for scalable enterprise SaaS.</div>
+        </div>
+      </div>
+
+      <div class="mt-4 glass p-3 reveal" data-reveal" style="border-radius: 22px; border-color: rgba(120,160,255,.22);">
+        <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+          <div style="font-family:'Syne',sans-serif;font-weight:900;">All enterprise features, card-first design</div>
+          <div class="d-flex gap-2 flex-wrap" style="color:var(--muted);font-size:12px;font-weight:800;">
+            <span class="badge rounded-pill" style="background:rgba(75,139,255,.12);border:1px solid rgba(75,139,255,.25);color:#7DB3FF">Method-level traceability</span>
+            <span class="badge rounded-pill" style="background:rgba(29,158,117,.10);border:1px solid rgba(29,158,117,.25);color:#3CE8B5">Secure attendance</span>
+            <span class="badge rounded-pill" style="background:rgba(124,58,237,.10);border:1px solid rgba(124,58,237,.25);color:#A78BFA">Fast admin workflows</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECHNOLOGY STACK -->
+  <section class="section-pad" id="stack">
+    <div class="container container-wide">
+      <div class="glass card-premium hover-lift reveal" data-reveal style="padding: 26px;">
+        <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+          <div>
+            <div class="kicker mb-2"><span class="dot-live" style="background:var(--cyan);box-shadow:0 0 0 6px rgba(68,215,255,.14)"></span> Technology Stack</div>
+            <div style="font-family:'Syne',sans-serif;font-weight:900;font-size:22px;">AI attendance built with proven engineering blocks</div>
+          </div>
+          <div class="glass p-3" style="border-radius:18px; background:rgba(255,255,255,.04);border-color: rgba(120,160,255,.22);">
+            <div style="color:var(--muted);font-size:12.5px;font-weight:800;">Works seamlessly with your backend APIs</div>
+            <div style="font-family:'Syne',sans-serif;font-weight:900;margin-top:6px;">Bootstrap + Flask + OpenCV</div>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+          <div class="col-6 col-md-4 col-lg-3"><div class="glass p-3 hover-lift" style="border-radius:18px;"><span class="badge rounded-pill" style="background:rgba(75,139,255,.12);border:1px solid rgba(75,139,255,.25);color:#7DB3FF;font-weight:900;">Python</span></div></div>
+          <div class="col-6 col-md-4 col-lg-3"><div class="glass p-3 hover-lift" style="border-radius:18px;"><span class="badge rounded-pill" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:

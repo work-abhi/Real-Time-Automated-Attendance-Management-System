@@ -100,6 +100,12 @@ body::after{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;
     <button class="btn-primary" id="login-btn" onclick="doLogin()">Login</button>
     <div class="error-msg" id="error-msg"></div>
 
+    <div class="link-row" style="margin-top:12px">
+      <span class="link" id="create-super-link" onclick="window.location.href='/super-admin/create-from-login'">Create Super Admin</span>
+      <span class="link" id="create-super-hint" style="color:var(--muted);text-align:right">(admin session required)</span>
+    </div>
+
+
     <!-- Forgot password form (No OTP) -->
     <div class="form-subcard" id="forgot-card">
       <div class="sub-title" id="forgot-title">Reset Password</div>
