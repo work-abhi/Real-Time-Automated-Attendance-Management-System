@@ -108,6 +108,14 @@
       border:1px solid transparent;
     }
     .nav-links a:hover{color:var(--text);background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14)}
+    .hamburger{
+  display:none;
+  width:40px;height:40px;border-radius:12px;
+  align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.05);
+  color:var(--text);cursor:pointer;
+}
 
     .btn{
       display:inline-flex;align-items:center;justify-content:center;gap:10px;
@@ -327,6 +335,38 @@
 
     /* JS parallax/reveal */
     @media(prefers-reduced-motion: reduce){.float,.orbit{animation:none !important}}
+    @media(max-width:768px){
+  .nav-links{
+    position:fixed;
+    top:74px; left:0; right:0;
+    flex-direction:column;
+    align-items:stretch;
+    background:rgba(8,12,22,.97);
+    padding:16px 20px;
+    border-bottom:1px solid rgba(255,255,255,.10);
+    display:none;
+    z-index:70;
+  }
+  .nav-links.open{display:flex;}
+  .nav-links a{padding:12px 14px;font-size:14px;}
+  .hamburger{display:flex;}
+}
+
+@media(max-width:575px){
+  .screen{height:auto;}
+  .screen-cols{grid-template-columns:1fr; height:auto;}
+  .mock-panel{margin-bottom:10px;}
+}
+
+@media(max-width:480px){
+  .logo-grid{grid-template-columns:repeat(2,1fr); font-size:12px;}
+  .logo-chip{padding:12px 8px;}
+}
+
+@media(max-width:400px){
+  .container{padding:0 14px;}
+  .mini .value{font-size:22px;}
+}
   </style>
 </head>
 <body>
@@ -352,6 +392,9 @@
         </div>
 
         <a class="btn btn-primary" href="#cta"><i class="fa-solid fa-rocket"></i> Get Started</a>
+        <button class="hamburger" id="navToggle" aria-label="Menu">
+  <i class="fa-solid fa-bars"></i>
+</button>
       </div>
     </div>
   </div>
@@ -729,6 +772,9 @@
       });
     };
     document.querySelectorAll('.glass').forEach(mxmy);
+    document.getElementById('navToggle').addEventListener('click', () => {
+  document.querySelector('.nav-links').classList.toggle('open');
+});
   </script>
 </body>
 </html>
